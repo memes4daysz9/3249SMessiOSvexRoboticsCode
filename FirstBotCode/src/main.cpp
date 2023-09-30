@@ -23,10 +23,7 @@ void on_center_button() {
 void initialize() {
 
 	pros::lcd::initialize();
-	FrontLeftMotor.set_voltage_limit(12000);
-    BackLeftMotor.set_voltage_limit(12000); //maxing out the motors
-    FrontRightMotor.set_voltage_limit(12000);
-    BackRightMotor.set_voltage_limit(12000);
+
 	pros::lcd::set_text(1, "ROBOT WILL SELF DESTTRUCT IF WE LOSE");
 }
 
@@ -57,6 +54,7 @@ void competition_initialize() {
 	MainController.clear();
 	MainController.set_text(0,0,"Your Controller's Battery is at " + MainController.get_battery_capacity() ); //initial Battery information
 	MainController.set_text(1,0,"your Robot's Battery is at " + VexBat );
+	
 }
 
 /**
@@ -86,35 +84,6 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	float VerticalPower;
-	float RotatePower;
-	float PowerCurveVertical;
-	float PowerCurveRotation;
-	float curve = 0.7f;
-	while (true) {
-		
-        VerticalPower = MainController.get_analog(ANALOG_LEFT_Y) * PowerCurveVertical; 
-        RotatePower = MainController.get_analog(ANALOG_RIGHT_X)* PowerCurveRotation;
-
-		PowerCurveVertical =  100*((1-curve)* VerticalPower / 100 + curve*(VerticalPower/100)*5);
-		PowerCurveRotation = 100*((1-curve)* RotatePower / 100 + curve*(RotatePower/100)*5); 
-
-
-
-        FrontLeftMotor.move(VerticalPower + RotatePower);
-        BackLeftMotor.move(VerticalPower + RotatePower);
-        FrontRightMotor.move(VerticalPower - RotatePower);
-        BackRightMotor.move(VerticalPower - RotatePower);
-
-
-
-
-
-
-		//Display Functions
-		pros::delay(20);
-
-	}
 	
 	//Brain display
 	while(true){
