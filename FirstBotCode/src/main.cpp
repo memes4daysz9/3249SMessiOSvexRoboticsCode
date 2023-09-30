@@ -3,14 +3,12 @@
 /**
  * A callback function for LLEMU's center button.
  *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
  */
 void on_center_button() {
 	static bool pressed = false;
 	pressed = !pressed;
 	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
+		pros::lcd::set_text(2, "NUH UH");
 	} else {
 		pros::lcd::clear_line(2);
 	}
@@ -23,10 +21,13 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
 
-	pros::lcd::register_btn1_cb(on_center_button);
+	pros::lcd::initialize();
+	FrontLeftMotor.set_voltage_limit(12000);
+    BackLeftMotor.set_voltage_limit(12000); //maxing out the motors
+    FrontRightMotor.set_voltage_limit(12000);
+    BackRightMotor.set_voltage_limit(12000);
+	pros::lcd::set_text(1, "ROBOT WILL SELF DESTTRUCT IF WE LOSE");
 }
 
 /**
@@ -34,7 +35,13 @@ void initialize() {
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
-void disabled() {}
+void disabled() {
+
+	FrontLeftMotor.brake();
+    BackLeftMotor.brake(); // Brakes motor
+    FrontRightMotor.brake();
+    BackRightMotor.brake();
+}
 
 /**
  * Runs after initialize(), and before autonomous when connected to the Field
@@ -45,7 +52,12 @@ void disabled() {}
  * This task will exit when the robot is enabled and autonomous or opcontrol
  * starts.
  */
-void competition_initialize() {}
+void competition_initialize() {
+	int VexBat = pros::battery::get_capacity();
+	MainController.clear();
+	MainController.set_text(0,0,"Your Controller's Battery is at " + MainController.get_battery_capacity() ); //initial Battery information
+	MainController.set_text(1,0,"your Robot's Battery is at " + VexBat );
+}
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -80,20 +92,48 @@ void opcontrol() {
 	float PowerCurveRotation;
 	float curve = 0.7f;
 	while (true) {
-
-        VerticalPower = MainController.get_analog(ANALOG_LEFT_Y) * PowerCurveVertical;
+		
+        VerticalPower = MainController.get_analog(ANALOG_LEFT_Y) * PowerCurveVertical; 
         RotatePower = MainController.get_analog(ANALOG_RIGHT_X)* PowerCurveRotation;
 
 		PowerCurveVertical =  100*((1-curve)* VerticalPower / 100 + curve*(VerticalPower/100)*5);
 		PowerCurveRotation = 100*((1-curve)* RotatePower / 100 + curve*(RotatePower/100)*5); 
 
-		
 
 
         FrontLeftMotor.move(VerticalPower + RotatePower);
         BackLeftMotor.move(VerticalPower + RotatePower);
         FrontRightMotor.move(VerticalPower - RotatePower);
         BackRightMotor.move(VerticalPower - RotatePower);
+
+
+
+
+
+
+		//Display Functions
 		pros::delay(20);
+
 	}
+	
+	//Brain display
+	while(true){
+		int VexBat = pros::battery::get_capacity();
+		pros::lcd::set_text(0,"ControllerBat" + MainController.get_battery_capacity()); //Brain displayed
+		pros::lcd::set_text(0,"MainBattery" + VexBat);
+		pros::delay(50);
+	}
+
+	//controller Display
+	while (true){
+		int VexBat = pros::battery::get_capacity();
+		MainController.clear();
+		MainController.set_text(0,0,"Your Controller's Battery is at " + MainController.get_battery_capacity() ); //initial Battery information
+		MainController.set_text(1,0,"your Robot's Battery is at " + VexBat );
+		pros::delay(1000);//delay for the controller is 110 with certain brains and you dont need anything sooner than 150ms of delay for your battery
+	}
+		
+	
+
+
 }
