@@ -1,5 +1,5 @@
 #include "main.h"
-
+#include "subsystemFiles/globals.cpp"
 /**
  * A callback function for LLEMU's center button.
  *
@@ -74,20 +74,26 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr(1);
-	pros::Motor right_mtr(2);
-
+	float VerticalPower;
+	float RotatePower;
+	float PowerCurveVertical;
+	float PowerCurveRotation;
+	float curve = 0.7f;
 	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-		int left = master.get_analog(ANALOG_LEFT_Y);
-		int right = master.get_analog(ANALOG_RIGHT_Y);
 
-		left_mtr = left;
-		right_mtr = right;
+        VerticalPower = MainController.get_analog(ANALOG_LEFT_Y) * PowerCurveVertical;
+        RotatePower = MainController.get_analog(ANALOG_RIGHT_X)* PowerCurveRotation;
 
+		PowerCurveVertical =  100*((1-curve)* VerticalPower / 100 + curve*(VerticalPower/100)*5);
+		PowerCurveRotation = 100*((1-curve)* RotatePower / 100 + curve*(RotatePower/100)*5); 
+
+		
+
+
+        FrontLeftMotor.move(VerticalPower + RotatePower);
+        BackLeftMotor.move(VerticalPower + RotatePower);
+        FrontRightMotor.move(VerticalPower - RotatePower);
+        BackRightMotor.move(VerticalPower - RotatePower);
 		pros::delay(20);
 	}
 }
