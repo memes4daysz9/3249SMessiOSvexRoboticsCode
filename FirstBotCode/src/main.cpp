@@ -1,5 +1,6 @@
 #include "main.h"
 #include "subsystemFiles/globals.cpp"
+#include "subsystemFiles/Logger.cpp"
 /**
  * A callback function for LLEMU's center button.
  *
@@ -25,7 +26,7 @@ void initialize() {
 	pros::lcd::initialize();
 
 	pros::lcd::set_text(1, "ROBOT WILL SELF DESTTRUCT IF WE LOSE");
-}
+}               
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -79,28 +80,23 @@ void autonomous() {}
  * If no competition control is connected, this function will run immediately
  * following initialize().
  *
+
+
+
+
+
+
+
+
+
+ 
  * If the robot is disabled or communications is lost, the
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
 void opcontrol() {
 	
-	//Brain display
-	while(true){
-		int VexBat = pros::battery::get_capacity();
-		pros::lcd::set_text(0,"ControllerBat" + MainController.get_battery_capacity()); //Brain displayed
-		pros::lcd::set_text(0,"MainBattery" + VexBat);
-		pros::delay(50);
-	}
 
-	//controller Display
-	while (true){
-		int VexBat = pros::battery::get_capacity();
-		MainController.clear();
-		MainController.set_text(0,0,"Your Controller's Battery is at " + MainController.get_battery_capacity() ); //initial Battery information
-		MainController.set_text(1,0,"your Robot's Battery is at " + VexBat );
-		pros::delay(1000);//delay for the controller is 110 with certain brains and you dont need anything sooner than 150ms of delay for your battery
-	}
 		
 	
 

@@ -1,5 +1,4 @@
 #include"main.h"
-#include "src/main.cpp"
 #include "globals.cpp"
 
 extern int PowerSavingMode = 0; //-1 = Extra Power mode. 0 is normal mode. 1 is moderate power saving mode. 2 is minor power saving mode. 3 is major poower saving mode. 
