@@ -6,7 +6,7 @@
 using namespace std;
 
 
-ofstream CurrentLog ("LogData.txt"); // global functions/variables
+ofstream CurrentLog ("/usd/LogData.txt"); // global functions/variables
 int pollingRate;
 
 void initialize() {
