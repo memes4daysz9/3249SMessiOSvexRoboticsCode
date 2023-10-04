@@ -3,6 +3,7 @@
 //motor encoders(counts = raw value, degress, rotations)
 //both fronts should be reversed
 pros::Motor FrontLeftMotor(1, pros::E_MOTOR_GEARSET_06, false,pros::E_MOTOR_ENCODER_COUNTS);
+pros::Motor FrontRightMotor(2,pros::E_MOTOR_GEARSET_06, false,pros:: E_MOTOR_ENCODER_COUNTS);
 //front Motors
 
 
