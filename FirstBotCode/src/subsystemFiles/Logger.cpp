@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include "globals.cpp"
 #include "main.h"
 #include "PowerAllocationFunctions.cpp"
 using namespace std;
@@ -8,6 +7,10 @@ using namespace std;
 
 ofstream CurrentLog ("/usd/LogData.txt"); // global functions/variables
 int pollingRate;
+pros::Motor FrontLeftMotor(1);
+pros::Motor FrontRightMotor(2);
+pros::Motor BackLeftMotor(3);
+pros::Motor BackRightMotor(4);
 
 void initialize() {
     

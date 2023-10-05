@@ -1,5 +1,11 @@
-#include "globals.cpp"
+#include "main.h"
 
+
+pros::Motor FrontLeftMotor(1);
+pros::Motor FrontRightMotor(2);
+pros::Motor BackLeftMotor(3);
+pros::Motor BackRightMotor(4);
+pros::Controller MainController (pros::E_CONTROLLER_MASTER);
 void opcontrol() {
 	float VerticalPower;
 	float RotatePower;
