@@ -1,21 +1,20 @@
-#include"main.h"
+#include"POF.h"
+#include "globals.cpp"
 
-extern int PowerSavingMode = 0; //-1 = Extra Power mode. 0 is normal mode. 1 is moderate power saving mode. 2 is minor power saving mode. 3 is major power saving mode. 
-pros::Motor FrontLeftMotor(1);
-pros::Motor FrontRightMotor(2);
-pros::Motor BackLeftMotor(3);
-pros::Motor BackRightMotor(4);
-
-pros::Motor ArmMotor(5);
-pros::Motor SecondArmMotor(6);
-pros::Motor ClawLeftMotor(7);
-pros::Motor ClawRightMotor(8);
-pros::ADIDigitalIn PowerSavingButton (1);
-pros::Controller MainController (pros::E_CONTROLLER_MASTER);
-
+extern int PowerSavingMode = 0; 
+    pros::Motor FrontLeftMotor(1);
+    pros::Motor FrontRightMotor(2);
+    pros::Motor BackLeftMotor(3);
+    pros::Motor BackRightMotor(4);
+    pros::Controller MainController(pros::E_CONTROLLER_MASTER);
+    pros::Motor ArmMotor(5);
+    pros::Motor SecondArmMotor(6);
+    pros::Motor ClawLeftMotor(7);
+    pros::Motor ClawRightMotor(8);
+    pros::ADIDigitalIn ButtonOfPowerSaving (1);
 void competition_initialize() { // Checks the initial power state then sets the power saving mode accordingly
     while (true){
-    if (PowerSavingButton.get_new_press()){
+    if (ButtonOfPowerSaving.get_new_press()){
         if (PowerSavingMode <= 2){
             PowerSavingMode += 1; //cycles the power saving mode then tells the controller and the brain the said power saving mode
             MainController.set_text(2,0, "PowerSavingSetting now at " + PowerSavingMode); 

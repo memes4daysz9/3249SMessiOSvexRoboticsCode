@@ -1,20 +1,11 @@
-#include "main.h"
+#include "maintwo.h"
 #include "subsystemFiles/globals.cpp"
-#include "subsystemFiles/Logger.cpp"
-/**
- * A callback function for LLEMU's center button.
- *
- */
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "NUH UH");
-	} else {
-		pros::lcd::clear_line(2);
-	}
-}
 
+pros::Motor FrontLeftMotor(1);
+pros::Motor FrontRightMotor(2);
+pros::Motor BackLeftMotor(3);
+pros::Motor BackRightMotor(4);
+pros::Controller MainController (pros::E_CONTROLLER_MASTER);
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -69,7 +60,7 @@ void competition_initialize() {
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -94,11 +85,4 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol() {
-	
 
-		
-	
-
-
-}
