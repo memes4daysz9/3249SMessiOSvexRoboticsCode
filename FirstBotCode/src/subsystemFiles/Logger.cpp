@@ -1,18 +1,16 @@
 #include <iostream>
 #include <fstream>
-#include "Logger.h"
-
+#include "main.h"
+#include "PowerAllocationFunctions.cpp"
 using namespace std;
 
+
+ofstream CurrentLog ("/usd/LogData.txt"); // global functions/variables
+int pollingRate;
 pros::Motor FrontLeftMotor(1);
 pros::Motor FrontRightMotor(2);
 pros::Motor BackLeftMotor(3);
 pros::Motor BackRightMotor(4);
-pros::Controller MainController(pros::E_CONTROLLER_MASTER);
-
-ofstream CurrentLog ("/usd/LogData.txt"); // global functions/variables
-int pollingRate = 2000;
-
 
 void initialize() {
     
@@ -27,7 +25,13 @@ void autonomous() {
 
     CurrentLog << "Running Auton, starting Motor and Battery polling";
 
-    
+    if (PowerSavingMode == -1){
+        pollingRate = 250;
+    }else if (PowerSavingMode == 0){ //polliong rate Functions
+        pollingRate = 750;
+    }else{
+    pollingRate = PowerSavingMode * 1000;
+    }
 
     while (true){ // runs auton polling
     int RobotBatLevel = pros::battery::get_capacity();

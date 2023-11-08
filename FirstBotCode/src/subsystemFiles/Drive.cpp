@@ -1,14 +1,11 @@
-#include "Drive.h"
-#include "globals.cpp"
+#include "main.h"
 
 
+pros::Motor FrontLeftMotor(1);
+pros::Motor FrontRightMotor(2);
+pros::Motor BackLeftMotor(3);
+pros::Motor BackRightMotor(4);
 pros::Controller MainController (pros::E_CONTROLLER_MASTER);
-
-    pros::Motor FrontLeftMotor(1);
-    pros::Motor FrontRightMotor(2);
-    pros::Motor BackLeftMotor(3);
-    pros::Motor BackRightMotor(4);
-	//urgay please send help
 void opcontrol() {
 	float VerticalPower;
 	float RotatePower;
@@ -27,8 +24,8 @@ void opcontrol() {
 
         FrontLeftMotor.move(VerticalPower + RotatePower);
         BackLeftMotor.move(VerticalPower + RotatePower);
-        FrontRightMotor.move(VerticalPower + RotatePower);
-        BackRightMotor.move(VerticalPower + RotatePower);
+        FrontRightMotor.move(VerticalPower - RotatePower);
+        BackRightMotor.move(VerticalPower - RotatePower);
 
 		pros::delay(20); //delay for resource saving
 

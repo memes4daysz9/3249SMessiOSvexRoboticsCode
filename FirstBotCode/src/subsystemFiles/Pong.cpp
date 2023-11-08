@@ -1,7 +1,6 @@
-
-#include "Pong.h"
+#include "globals.cpp"
 
 void competition_initialize(){
-
+     
      
 }
