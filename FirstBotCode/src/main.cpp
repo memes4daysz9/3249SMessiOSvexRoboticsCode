@@ -38,14 +38,15 @@ bool RightSide;
 bool LeftSide;
 void initialize() {
 	pros::lcd::initialize();
-	pros::Motor FrontLeftMotor_initializer(1, pros::E_MOTOR_GEARSET_06, false,pros::E_MOTOR_ENCODER_COUNTS);
-	pros::Motor FrontRightMotor_initializer(2,pros::E_MOTOR_GEARSET_06, true,pros:: E_MOTOR_ENCODER_COUNTS);
+	pros::Motor FrontLeftMotor_initializer(1, pros::E_MOTOR_GEARSET_18, false,pros::E_MOTOR_ENCODER_COUNTS);
+	pros::Motor FrontRightMotor_initializer(2,pros::E_MOTOR_GEARSET_18, true,pros:: E_MOTOR_ENCODER_COUNTS);
 //front Motors
 
 
 //Back Motors
-	pros::Motor BackLeftMotor_initializer(3, pros::E_MOTOR_GEARSET_06, false,pros::E_MOTOR_ENCODER_COUNTS);
-	pros::Motor BackRightMotor_initializer(4, pros::E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_COUNTS);
+	pros::Motor BackLeftMotor_initializer(3, pros::E_MOTOR_GEARSET_18, false,pros::E_MOTOR_ENCODER_COUNTS);
+	pros::Motor BackRightMotor_initializer(4, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_COUNTS);
+	pros::Motor CataMotor_initializer(5, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_COUNTS);
 
 
 
@@ -58,44 +59,9 @@ void initialize() {
 	CurrentLog << "File started"; 
 }
 
-void DistanceToTravel(float WantedDistance, int Power){ //distance in inches
-	// for every 360degrees, the wheel will go its circumference
-
-	pros::Motor FrontLeftMotor(1);
-    pros::Motor FrontRightMotor(2);
-    pros::Motor BackLeftMotor(3);
-    pros::Motor BackRightMotor(4);
 
 
-
-	float circumference =pi*diameter;
-
-	float distancePerDegree = circumference/360;
-
-	float AngleInDegrees = WantedDistance/distancePerDegree;// forwards angle movement
-
-	FrontLeftMotor.move_relative(AngleInDegrees,Power);
-	FrontRightMotor.move_relative(AngleInDegrees,Power);
-	BackLeftMotor.move_relative(AngleInDegrees,Power);
-	BackRightMotor.move_relative(AngleInDegrees,Power);
-
-}
-
-void AmountToRotate(float DegreesToRotate, int Power){
-	pros::Motor FrontLeftMotor(1);
-    pros::Motor FrontRightMotor(2);
-    pros::Motor BackLeftMotor(3);
-    pros::Motor BackRightMotor(4);
-
-	float circumference =pi*diameter;
-	float DistanceToMoveOnCircumference = DegreesToRotate/360  * circumference;
-	float DegreesToMove = DistanceToMoveOnCircumference / diameter * 360;
-	
-	FrontLeftMotor.move_relative(-DegreesToMove, Power);
-	BackLeftMotor.move_relative(-DegreesToMove, Power);
-	FrontRightMotor.move_relative(DegreesToMove,Power);
-	BackRightMotor.move_relative(DegreesToMove,Power);
-}               
+              
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -127,7 +93,51 @@ void competition_initialize() {
 	}
 	
 }
+void DistanceToTravel(float WantedDistance, int Power){ //distance in inches
+	// for every 360degrees, the wheel will go its circumference
+
+	pros::Motor FrontLeftMotor(1);
+    pros::Motor FrontRightMotor(2);
+    pros::Motor BackLeftMotor(3);
+    pros::Motor BackRightMotor(4);
+
+	FrontLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	BackLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	FrontRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	BackRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+
+
+
+	float circumference =pi*diameter;
+
+	float distancePerDegree = circumference/360;
+
+	float AngleInDegrees = WantedDistance/distancePerDegree;// forwards angle movement
+
+	FrontLeftMotor.move_relative(AngleInDegrees,Power);
+	FrontRightMotor.move_relative(AngleInDegrees,Power);
+	BackLeftMotor.move_relative(AngleInDegrees,Power);
+	BackRightMotor.move_relative(AngleInDegrees,Power);
+
+}
+void AmountToRotate(float DegreesToRotate, int Power){
+	pros::Motor FrontLeftMotor(1);
+    pros::Motor FrontRightMotor(2);
+    pros::Motor BackLeftMotor(3);
+    pros::Motor BackRightMotor(4);
+
+	float circumference =pi*diameter;
+	float DistanceToMoveOnCircumference = DegreesToRotate/360  * circumference;
+	float DegreesToMove = DistanceToMoveOnCircumference / diameter * 360;
+	
+	FrontLeftMotor.move_relative(-DegreesToMove, Power);
+	BackLeftMotor.move_relative(-DegreesToMove, Power);
+	FrontRightMotor.move_relative(DegreesToMove,Power);
+	BackRightMotor.move_relative(DegreesToMove,Power);
+} 
 void autonomous() {
+
 
 
 if(RightSide){
@@ -200,6 +210,26 @@ float cPower;
  float curve = 0.7f;
 
 
+/*PID info
+P=error *kP
+I=integral*kI
+D=(error-last error)*kD
+
+integral = integral + error
+*/
+
+float P;
+float I;
+float D;
+float PID;//voltage for the motors to use
+float error;// the distance from the target
+float lastError;// error from last loop
+float integral;
+float kD= 0.5;
+float kI= 0.5;
+float kP= 0.5;
+float target;//the target voltage for the PID to hit
+float CataMotorTemp;
 
 
 
@@ -211,7 +241,18 @@ float cPower;
 	left = cPower + cTurn;
 	right = cPower - cTurn;
 
+	if (CataMotorTemp <= 55){
+		target = 6000;
+	}else if (CataMotorTemp >= 50){
+		target = 12000; // when it starts overheating, set the voltage higher to counter 
+	}
+	error = target - PID;
+	integral = integral + error;
+	P = error * kP;
+	I = integral * kI;
+	D = (error - lastError)*kD;
 
+	PID = P+I+D;
 
 if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
 
@@ -227,10 +268,12 @@ if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
 
 
 if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
-	CataMotor.move(100);
-}else{
-	CataMotor.brake();
-}
+	CataMotor.move_voltage(PID);
+}else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
+	CataMotor.move_voltage(-PID);
+}else {
+	(CataMotor.move_voltage(0));
+	}
 
 
 
@@ -245,6 +288,7 @@ if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
 
 
 		pros::delay(20); //delay for resource saving
+		lastError = error;
 	}
 
 	}
