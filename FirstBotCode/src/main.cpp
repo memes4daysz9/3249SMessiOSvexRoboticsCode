@@ -225,9 +225,9 @@ float PID;//voltage for the motors to use
 float error;// the distance from the target
 float lastError;// error from last loop
 float integral;
-float kD= 0.5;
-float kI= 0.5;
-float kP= 0.5;
+float kD= 0.2;
+float kI= 0.3;
+float kP= 0.2;
 float target;//the target voltage for the PID to hit
 float CataMotorTemp;
 
@@ -271,11 +271,15 @@ if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
 	CataMotor.move_voltage(PID);
 }else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
 	CataMotor.move_voltage(-PID);
+		if (error <= 2000){
+		MainController.rumble(". . .");
+	}
 }else {
 	(CataMotor.move_voltage(0));
 	}
 
 
+	
 
 	
 	
