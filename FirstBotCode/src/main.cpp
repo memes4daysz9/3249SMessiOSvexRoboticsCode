@@ -1,3 +1,6 @@
+#include "main.h"
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 int PowerSavingMode = 0; 
@@ -10,22 +13,40 @@ const int triballAmount = 12; // the amount of triballs that will be shot from t
 
 	ofstream CurrentLog ("/usd/LogData.txt"); // global functions/variables
 	int pollingRate = 2000;
+
+
+
+
+
+
+
+// Wheel Nerdy Stuf
+	float diameter = 4.125f;//diameter of the omni wheels for distance measuring
+
+	float radius = diameter * 0.5;//radius of the omni wheel for distance measuring
+
+	float pi =  3.14;//just a shorter  pi for easier processing which is at 3.14
+
+
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
+bool RightSide;
+bool LeftSide;
 void initialize() {
 	pros::lcd::initialize();
-	pros::Motor FrontLeftMotor_initializer(1, pros::E_MOTOR_GEARSET_06, false,pros::E_MOTOR_ENCODER_COUNTS);
-	pros::Motor FrontRightMotor_initializer(2,pros::E_MOTOR_GEARSET_06, true,pros:: E_MOTOR_ENCODER_COUNTS);
+	pros::Motor FrontLeftMotor_initializer(1, pros::E_MOTOR_GEARSET_18, false,pros::E_MOTOR_ENCODER_COUNTS);
+	pros::Motor FrontRightMotor_initializer(2,pros::E_MOTOR_GEARSET_18, true,pros:: E_MOTOR_ENCODER_COUNTS);
 //front Motors
 
 
 //Back Motors
-	pros::Motor BackLeftMotor_initializer(3, pros::E_MOTOR_GEARSET_06, false,pros::E_MOTOR_ENCODER_COUNTS);
-	pros::Motor BackRightMotor_initializer(4, pros::E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_COUNTS);
+	pros::Motor BackLeftMotor_initializer(3, pros::E_MOTOR_GEARSET_18, false,pros::E_MOTOR_ENCODER_COUNTS);
+	pros::Motor BackRightMotor_initializer(4, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_COUNTS);
+	pros::Motor CataMotor_initializer(5, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_COUNTS);
 
 
 
@@ -36,7 +57,11 @@ void initialize() {
 
 	pros::lcd::set_text(1, "Nerd");
 	CurrentLog << "File started"; 
-}               
+}
+
+
+
+              
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -56,18 +81,92 @@ void disabled() {
  * starts.
  */
 void competition_initialize() {
+	pros::Controller MainController(pros::E_CONTROLLER_MASTER);
 	CurrentLog << "Initiation Complete! Running Competition initialized";
-
+	
+	while (true){
+		if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)){
+			RightSide = true;
+		}else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){
+			LeftSide = true;
+		}
+	}
 	
 }
+void DistanceToTravel(float WantedDistance, int Power){ //distance in inches
+	// for every 360degrees, the wheel will go its circumference
+
+	pros::Motor FrontLeftMotor(1);
+    pros::Motor FrontRightMotor(2);
+    pros::Motor BackLeftMotor(3);
+    pros::Motor BackRightMotor(4);
+
+	FrontLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	BackLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	FrontRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	BackRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+
+
+
+	float circumference =pi*diameter;
+
+	float distancePerDegree = circumference/360;
+
+	float AngleInDegrees = WantedDistance/distancePerDegree;// forwards angle movement
+
+	FrontLeftMotor.move_relative(AngleInDegrees,Power);
+	FrontRightMotor.move_relative(AngleInDegrees,Power);
+	BackLeftMotor.move_relative(AngleInDegrees,Power);
+	BackRightMotor.move_relative(AngleInDegrees,Power);
+
+}
+void AmountToRotate(float DegreesToRotate, int Power){
+	pros::Motor FrontLeftMotor(1);
+    pros::Motor FrontRightMotor(2);
+    pros::Motor BackLeftMotor(3);
+    pros::Motor BackRightMotor(4);
+
+	float circumference =pi*diameter;
+	float DistanceToMoveOnCircumference = DegreesToRotate/360  * circumference;
+	float DegreesToMove = DistanceToMoveOnCircumference / diameter * 360;
+	
+	FrontLeftMotor.move_relative(-DegreesToMove, Power);
+	BackLeftMotor.move_relative(-DegreesToMove, Power);
+	FrontRightMotor.move_relative(DegreesToMove,Power);
+	BackRightMotor.move_relative(DegreesToMove,Power);
+} 
 void autonomous() {
-		pros::ADIDigitalOut pneumatic(1 ,'a');
-		for (int i = 0; i <= triballAmount; i++ ){
-	pneumatic.set_value(LOW);
-	pros::delay(700);
-	pneumatic.set_value(HIGH);
-	pros::delay(500);
-	}
+
+
+
+if(RightSide){
+	pros::lcd::clear;
+	pros::lcd::set_text(1, "Set To Right Side!");
+	DistanceToTravel(7,25);
+	pros::delay(2000);
+	AmountToRotate(50, 20);
+	pros::delay(2000);
+	DistanceToTravel(30,70);
+}else if (LeftSide){
+	pros::lcd::clear;
+
+	pros::lcd::set_text(1, "Set To Left Side!");
+	DistanceToTravel(7,25);
+	pros::delay(2000);
+	AmountToRotate(-50, 20);
+	pros::delay(2000);
+	DistanceToTravel(30,70);
+}else{
+	AmountToRotate(720,100);
+}
+
+
+
+
+
+
+
 }
 
 
@@ -91,17 +190,16 @@ float cPower;
 
 
 void opcontrol() {
-	pros::ADIDigitalOut pneumatic(1 ,'a');
+	pros::ADIDigitalOut FirstWingMan(1 ,'a');
+	pros::ADIDigitalOut SecondWingMan(2 ,'b');
 
     pros::Controller MainController(pros::E_CONTROLLER_MASTER);
 	pros::Motor FrontLeftMotor(1);
     pros::Motor FrontRightMotor(2);
     pros::Motor BackLeftMotor(3);
     pros::Motor BackRightMotor(4);
-	pros::Motor ArmMotor(5);
-    pros::Motor ClawOpenMotor(9);
-    pros::Motor ClawLeftMotor(7);
-    pros::Motor ClawRightMotor(8);
+	pros::Motor CataMotor(5);
+
 
 	pros::lcd::set_text(1, "Motors Compiled!");
 
@@ -110,12 +208,30 @@ float cPower;
  float left;
  float right;
  float curve = 0.7f;
- float ClawMovement;
 
 
+/*PID info
+P=error *kP
+I=integral*kI
+D=(error-last error)*kD
 
-	float ArmUp;
-	float ArmMove;
+integral = integral + error
+*/
+
+float P;
+float I;
+float D;
+float PID;//voltage for the motors to use
+float error;// the distance from the target
+float lastError;// error from last loop
+float integral;
+float kD= 0.1;
+float kI= 0.1;
+float kP= 0.7;
+float target;//the target voltage for the PID to hit
+float CataMotorTemp;
+bool KILLMODE;
+
 
 
 	while (true) {         // the while true Command
@@ -125,91 +241,82 @@ float cPower;
 
 	left = cPower + cTurn;
 	right = cPower - cTurn;
+	if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){
+		CataMotor.set_voltage_limit(30000);//NOTE this is in mV meaning that its doing 30V.... and yes, PROS lets this happen and the motors smell alot
+		CataMotor.set_current_limit(5000);//2500mA is the normal amount
+		target = 30000;//sets the target voltage to 30 Volts, the normal amount is 12V
+	}else if (CataMotorTemp <= 55){
+		target = 8000;
+	}
+	error = target - PID;
+	integral = integral + error;
+	P = error * kP;
+	I = integral * kI;
+	D = (error - lastError)*kD;
 
-
+	PID = P+I+D;
 
 if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
-	pneumatic.set_value(HIGH);
+
+	FirstWingMan.set_value(HIGH);
+	SecondWingMan.set_value(HIGH);
+
 }else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
-	pneumatic.set_value(LOW);
-}else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
-	pneumatic.set_value(LOW);
-}else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
-		pros::ADIDigitalOut pneumatic(1 ,'a');
-		for (int i = 0; i <= triballAmount; i++ ){
-	pneumatic.set_value(LOW);
-	pros::delay(700);
-	pneumatic.set_value(HIGH);
-	pros::delay(500);
-	}
+
+	FirstWingMan.set_value(LOW);
+	SecondWingMan.set_value(LOW);
+
 }
 
-ClawOpenMotor.move(ClawMovement*100);
 
+if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
+	CataMotor.move_voltage(PID);
+}else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
+	CataMotor.move_voltage(-PID);
+}else if(MainController.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+	CataMotor.move_voltage(0);
+}
 
 
 	
+if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
+	KILLMODE = true;
+	FrontLeftMotor.set_voltage_limit(30000);
+	FrontRightMotor.set_voltage_limit(30000);
+	BackLeftMotor.set_voltage_limit(30000);
+	BackRightMotor.set_voltage_limit(30000);
+	FrontLeftMotor.set_current_limit(5000);
+	FrontRightMotor.set_current_limit(5000);
+	BackLeftMotor.set_current_limit(5000);
+	BackRightMotor.set_current_limit(5000);
+
+}else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_A)){
+	KILLMODE = false;
+	FrontLeftMotor.set_voltage_limit(12000);
+	FrontRightMotor.set_voltage_limit(12000);
+	BackLeftMotor.set_voltage_limit(12000);
+	BackRightMotor.set_voltage_limit(12000);
+}
 	
-		
-// 8 motor drive
+	
+if (KILLMODE == false){
+// 4 motor drive
  	FrontLeftMotor.move(100*(((1-curve)*left)/100+(curve*pow(left/100,7))));
  	FrontRightMotor.move(100*(((1-curve)*right)/100+(curve*pow(right/100,7))));
   	BackLeftMotor.move(100*(((1-curve)*left)/100+(curve*pow(left/100,7))));
- 	BackRightMotor.move(100*(((1-curve)*right)/100+(curve*pow(right/100,7))));
+ 	BackRightMotor.move(100*(((1-curve)*right)/100+(curve*pow(right/100,7))));}
+	else if (KILLMODE ==  true){
+		FrontLeftMotor.move_voltage(30000 * left);
+		BackLeftMotor.move_voltage(30000 * left);
+		FrontRightMotor.move_voltage(30000 * right);
+		BackRightMotor.move_voltage(30000 * right);
+	}
 
-
-		ArmMotor.move(ArmUp);
-
-		ClawLeftMotor.move(ArmMove);
-		ClawRightMotor.move(-ArmMove);
 
 		pros::delay(20); //delay for resource saving
+		lastError = error;
 	}
 
 	}
 
-
-
-
-
-
-
-
-
-/**
- * Runs the user autonomous code. This function will be started in its own task
- * with the default priority and stack size whenever the robot is enabled via
- * the Field Management System or the VEX Competition Switch in the autonomous
- * mode. Alternatively, this function may be called in initialize or opcontrol
- * for non-competition testing purposes.
- *
- * If the robot is disabled or communications is lost, the autonomous task
- * will be stopped. Re-enabling the robot will restart the task, not re-start it
- * from where it left off.
- */
-
-
-/**
- * Runs the operator control code. This function will be started in its own task
- * with the default priority and stack size whenever the robot is enabled via
- * the Field Management System or the VEX Competition Switch in the operator
- * control mode.
- *
- * If no competition control is connected, this function will run immediately
- * following initialize().
- *
-
-
-
-
-
-
-
-
-
- 
- * If the robot is disabled or communications is lost, the
- * operator control task will be stopped. Re-enabling the robot will restart the
- * task, not resume it from where it left off.
- */
 
