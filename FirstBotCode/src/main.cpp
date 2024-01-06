@@ -225,11 +225,12 @@ float PID;//voltage for the motors to use
 float error;// the distance from the target
 float lastError;// error from last loop
 float integral;
-float kD= 0.2;
-float kI= 0.3;
-float kP= 0.2;
+float kD= 0.1;
+float kI= 0.1;
+float kP= 0.7;
 float target;//the target voltage for the PID to hit
 float CataMotorTemp;
+bool KILLMODE;
 
 
 
@@ -240,11 +241,12 @@ float CataMotorTemp;
 
 	left = cPower + cTurn;
 	right = cPower - cTurn;
-
-	if (CataMotorTemp <= 55){
-		target = 6000;
-	}else if (CataMotorTemp >= 50){
-		target = 12000; // when it starts overheating, set the voltage higher to counter 
+	if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){
+		CataMotor.set_voltage_limit(30000);//NOTE this is in mV meaning that its doing 30V.... and yes, PROS lets this happen and the motors smell alot
+		CataMotor.set_current_limit(5000);//2500mA is the normal amount
+		target = 30000;//sets the target voltage to 30 Volts, the normal amount is 12V
+	}else if (CataMotorTemp <= 55){
+		target = 8000;
 	}
 	error = target - PID;
 	integral = integral + error;
@@ -271,24 +273,44 @@ if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
 	CataMotor.move_voltage(PID);
 }else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
 	CataMotor.move_voltage(-PID);
-		if (error <= 2000){
-		MainController.rumble(". . .");
-	}
-}else {
-	(CataMotor.move_voltage(0));
-	}
+}else if(MainController.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+	CataMotor.move_voltage(0);
+}
 
 
 	
+if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
+	KILLMODE = true;
+	FrontLeftMotor.set_voltage_limit(30000);
+	FrontRightMotor.set_voltage_limit(30000);
+	BackLeftMotor.set_voltage_limit(30000);
+	BackRightMotor.set_voltage_limit(30000);
+	FrontLeftMotor.set_current_limit(5000);
+	FrontRightMotor.set_current_limit(5000);
+	BackLeftMotor.set_current_limit(5000);
+	BackRightMotor.set_current_limit(5000);
 
+}else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_A)){
+	KILLMODE = false;
+	FrontLeftMotor.set_voltage_limit(12000);
+	FrontRightMotor.set_voltage_limit(12000);
+	BackLeftMotor.set_voltage_limit(12000);
+	BackRightMotor.set_voltage_limit(12000);
+}
 	
 	
-		
+if (KILLMODE == false){
 // 4 motor drive
  	FrontLeftMotor.move(100*(((1-curve)*left)/100+(curve*pow(left/100,7))));
  	FrontRightMotor.move(100*(((1-curve)*right)/100+(curve*pow(right/100,7))));
   	BackLeftMotor.move(100*(((1-curve)*left)/100+(curve*pow(left/100,7))));
- 	BackRightMotor.move(100*(((1-curve)*right)/100+(curve*pow(right/100,7))));
+ 	BackRightMotor.move(100*(((1-curve)*right)/100+(curve*pow(right/100,7))));}
+	else if (KILLMODE ==  true){
+		FrontLeftMotor.move_voltage(30000 * left);
+		BackLeftMotor.move_voltage(30000 * left);
+		FrontRightMotor.move_voltage(30000 * right);
+		BackRightMotor.move_voltage(30000 * right);
+	}
 
 
 		pros::delay(20); //delay for resource saving
