@@ -21,11 +21,7 @@ const int triballAmount = 12; // the amount of triballs that will be shot from t
 
 
 // Wheel Nerdy Stuf
-	float diameter = 4.125f;//diameter of the omni wheels for distance measuring
 
-	float radius = diameter * 0.5;//radius of the omni wheel for distance measuring
-
-	float pi =  3.14;//just a shorter  pi for easier processing which is at 3.14
 
 
 /**
@@ -93,49 +89,8 @@ void competition_initialize() {
 	}
 	
 }
-void DistanceToTravel(float WantedDistance, int Power){ //distance in inches
-	// for every 360degrees, the wheel will go its circumference
-
-	pros::Motor FrontLeftMotor(1);
-    pros::Motor FrontRightMotor(2);
-    pros::Motor BackLeftMotor(3);
-    pros::Motor BackRightMotor(4);
-
-	FrontLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-	BackLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-	FrontRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-	BackRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
 
-
-
-	float circumference =pi*diameter;
-
-	float distancePerDegree = circumference/360;
-
-	float AngleInDegrees = WantedDistance/distancePerDegree;// forwards angle movement
-
-	FrontLeftMotor.move_relative(AngleInDegrees,Power);
-	FrontRightMotor.move_relative(AngleInDegrees,Power);
-	BackLeftMotor.move_relative(AngleInDegrees,Power);
-	BackRightMotor.move_relative(AngleInDegrees,Power);
-
-}
-void AmountToRotate(float DegreesToRotate, int Power){
-	pros::Motor FrontLeftMotor(1);
-    pros::Motor FrontRightMotor(2);
-    pros::Motor BackLeftMotor(3);
-    pros::Motor BackRightMotor(4);
-
-	float circumference =pi*diameter;
-	float DistanceToMoveOnCircumference = DegreesToRotate/360  * circumference;
-	float DegreesToMove = DistanceToMoveOnCircumference / diameter * 360;
-	
-	FrontLeftMotor.move_relative(-DegreesToMove, Power);
-	BackLeftMotor.move_relative(-DegreesToMove, Power);
-	FrontRightMotor.move_relative(DegreesToMove,Power);
-	BackRightMotor.move_relative(DegreesToMove,Power);
-} 
 void autonomous() {
 
 
@@ -143,21 +98,17 @@ void autonomous() {
 if(RightSide){
 	pros::lcd::clear;
 	pros::lcd::set_text(1, "Set To Right Side!");
-	DistanceToTravel(7,25);
-	pros::delay(2000);
-	AmountToRotate(50, 20);
-	pros::delay(2000);
-	DistanceToTravel(30,70);
+	Forward(7,100);
+	Rotate(50, 100);
+	Forward(30,100);
 }else if (LeftSide){
 	pros::lcd::clear;
 	pros::lcd::set_text(1, "Set To Left Side!");
-	DistanceToTravel(7,25);
-	pros::delay(2000);
-	AmountToRotate(-50, 20);
-	pros::delay(2000);
-	DistanceToTravel(30,70);
+	Forward(7,100);
+	Rotate(-50, 100);
+	Forward(30,100);
 }else{
-	AmountToRotate(720,100);
+	Rotate(720,100);
 }
 
 
