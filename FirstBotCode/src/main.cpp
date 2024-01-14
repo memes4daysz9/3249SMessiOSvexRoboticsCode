@@ -98,17 +98,17 @@ void autonomous() {
 if(RightSide){
 	pros::lcd::clear;
 	pros::lcd::set_text(1, "Set To Right Side!");
-	Forward(7,100);
-	Rotate(50, 100);
-	Forward(30,100);
+	Forward(7);
+	Rotate(50);
+	Forward(30);
 }else if (LeftSide){
 	pros::lcd::clear;
 	pros::lcd::set_text(1, "Set To Left Side!");
-	Forward(7,100);
-	Rotate(-50, 100);
-	Forward(30,100);
+	Forward(7);
+	Rotate(-50);
+	Forward(30);
 }else{
-	Rotate(720,100);
+	Rotate(720);
 }
 
 
