@@ -1,6 +1,7 @@
 #include "main.h"
 #include <iostream>
 #include <fstream>
+#include "Odom.cpp"
 using namespace std;
 
 int PowerSavingMode = 0; 
@@ -9,7 +10,7 @@ const int triballAmount = 12; // the amount of triballs that will be shot from t
 
 
 
-    pros::ADIDigitalIn ButtonOfPowerSaving (1);
+
 
 	ofstream CurrentLog ("/usd/LogData.txt"); // global functions/variables
 	int pollingRate = 2000;
@@ -49,7 +50,7 @@ void initialize() {
 	pros::Motor CataMotor_initializer(5, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_COUNTS);
 
 
-
+  pros::Task OdomTask(OdomTracking);
 
 
 
