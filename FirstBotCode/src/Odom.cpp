@@ -28,7 +28,7 @@ void  OdomTracking(){
     
 
 }
-bool Forward(float WantedDistance, int Power){ //distance in inches
+bool Forward(float WantedDistance){ //distance in inches
 	// for every 360degrees, the wheel will go its circumference
     bool TargetMet;
 	pros::Motor FrontLeftMotor(1);
@@ -81,7 +81,7 @@ while (true){//PID Loop W
     }
 
 }
-bool Rotate(float DegreesToRotate, int Power){
+bool Rotate(float DegreesToRotate){
     
     bool TargetMet;
 	pros::Motor FrontLeftMotor(1);
