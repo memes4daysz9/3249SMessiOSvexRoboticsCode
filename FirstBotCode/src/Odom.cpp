@@ -53,24 +53,27 @@ bool Forward(float WantedDistance, int Power){ //distance in inches
     float P;
     float I;
     float D;
-    float kP;
-    float kI;
-    float kD;
+    float kP = 0.1;
+    float kI = 0.1;
+    float kD = 0.1;
     float error;
     float LastError;
     float PID;
     float LeftTarget;
     float RightTarget;
+    LeftTarget = AngleInDegrees + LeftMotorEncoder;
+    RightTarget = AngleInDegrees + RightMotorEncoder;
+
 while (true){//PID Loop W
     error = ((LeftTarget - LeftMotorEncoder) + (RightTarget - RightMotorEncoder))/2;
     P = error * kP;
     I = (I+error) *kI;
     D = (error-LastError)*kD; 
     PID = P + I + D;
-	FrontLeftMotor.move_relative(AngleInDegrees,Power);
-	FrontRightMotor.move_relative(AngleInDegrees,Power);
-	BackLeftMotor.move_relative(AngleInDegrees,Power);
-	BackRightMotor.move_relative(AngleInDegrees,Power);
+	FrontLeftMotor.move_voltage(-PID);
+	BackLeftMotor.move_voltage(-PID);
+	FrontRightMotor.move_voltage(PID);
+	BackRightMotor.move_voltage(PID);
 
     if (TargetMet == true){
         return true;
@@ -92,14 +95,16 @@ bool Rotate(float DegreesToRotate, int Power){
 	float P;
     float I;
     float D;
-    float kP;
-    float kI;
-    float kD;
+    float kP = 0.1;
+    float kI = 0.1;
+    float kD = 0.1;
     float error;
     float LastError;
     float PID;
     float LeftTarget;
     float RightTarget;
+    LeftTarget = -DegreesToMove + LeftMotorEncoder;
+    RightTarget = DegreesToMove + RightMotorEncoder;
 while (true){//PID Loop W
     error = ((LeftTarget - LeftMotorEncoder) + (RightTarget - RightMotorEncoder))/2;
     P = error * kP;
