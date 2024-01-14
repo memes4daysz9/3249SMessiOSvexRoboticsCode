@@ -1,7 +1,6 @@
 #include "main.h"
-#include <iostream>
 #include <fstream>
-#include "Odom.cpp"
+#include "Odom.h"
 using namespace std;
 
 int PowerSavingMode = 0; 
@@ -151,7 +150,6 @@ if(RightSide){
 	DistanceToTravel(30,70);
 }else if (LeftSide){
 	pros::lcd::clear;
-
 	pros::lcd::set_text(1, "Set To Left Side!");
 	DistanceToTravel(7,25);
 	pros::delay(2000);
