@@ -1,9 +1,11 @@
 #include "main.h"
 #include <fstream>
 #include "Odom.h"
+#include "Screen.h"
+#include "pros/adi.h"
 using namespace std;
 
-int PowerSavingMode = 0; 
+int AutonSide;
 const int triballAmount = 12; // the amount of triballs that will be shot from the pnumatics, normally this variable will be used once during auton
 
 
@@ -45,13 +47,13 @@ void initialize() {
 	pros::Motor CataMotor_initializer(5, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_COUNTS);
 
 
-  pros::Task OdomTask(OdomTracking);
-
+  pros::Task OdomTask(OdomTracking); //multithreading W
+  pros::Task ScreenTask(ScreenStats); 
 
 
 	pros::lcd::initialize();
 
-	pros::lcd::set_text(1, "Nerd");
+	
 	CurrentLog << "File started"; 
 }
 
@@ -93,17 +95,23 @@ void competition_initialize() {
 
 void autonomous() {
 
+	pros::ADIDigitalOut FirstWingMan(1 ,'a');
+	pros::ADIDigitalOut SecondWingMan(2 ,'b');
 
 
-if(RightSide){
-	pros::lcd::clear;
-	pros::lcd::set_text(1, "Set To Right Side!");
-	Forward(7);
-	Rotate(50);
-	Forward(30);
-}else if (LeftSide){
-	pros::lcd::clear;
-	pros::lcd::set_text(1, "Set To Left Side!");
+if(AutonSide = 1){
+	FirstWingMan.set_value(HIGH);
+	Rotate(-22.5);
+	Forward(5);
+	Rotate(-67.5);
+	Forward(24);
+	Rotate(-90);
+	Forward(36);
+	SecondWingMan.set_value(HIGH);
+	Forward(12);
+	Rotate(135);
+
+}else if (AutonSide = 2){
 	Forward(7);
 	Rotate(-50);
 	Forward(30);
@@ -140,6 +148,8 @@ float cPower;
 
 
 void opcontrol() {
+	
+
 	pros::ADIDigitalOut FirstWingMan(1 ,'a');
 	pros::ADIDigitalOut SecondWingMan(2 ,'b');
 

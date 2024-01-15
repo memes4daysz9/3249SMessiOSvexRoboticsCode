@@ -74,8 +74,8 @@ while (true){//PID Loop W
 	BackLeftMotor.move_voltage(-PID);
 	FrontRightMotor.move_voltage(PID);
 	BackRightMotor.move_voltage(PID);
-
-    if (TargetMet == true){
+    
+    if (error <= 5){
         return true;
     }
     }
@@ -116,7 +116,7 @@ while (true){//PID Loop W
 	FrontRightMotor.move_voltage(PID);
 	BackRightMotor.move_voltage(PID);
     
-    if (TargetMet == true){
+    if (error < 5){
         return true;
     }
     LastError = error;
