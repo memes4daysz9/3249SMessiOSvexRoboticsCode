@@ -95,29 +95,7 @@ void competition_initialize() {
 
 void autonomous() {
 
-	pros::ADIDigitalOut FirstWingMan(1 ,'a');
-	pros::ADIDigitalOut SecondWingMan(2 ,'b');
 
-
-if(AutonSide = 1){
-	FirstWingMan.set_value(HIGH);
-	Rotate(-22.5);
-	Forward(5);
-	Rotate(-67.5);
-	Forward(24);
-	Rotate(-90);
-	Forward(36);
-	SecondWingMan.set_value(HIGH);
-	Forward(12);
-	Rotate(135);
-
-}else if (AutonSide = 2){
-	Forward(7);
-	Rotate(-50);
-	Forward(30);
-}else{
-	Rotate(720);
-}
 
 
 
