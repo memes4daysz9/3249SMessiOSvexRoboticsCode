@@ -1,6 +1,7 @@
 #include "main.h"
 #include "pros/colors.h"
 #include "pros/screen.hpp"
+#include "globals.h"
 
 int PixelPos = 0;
 bool autonSelected = false;

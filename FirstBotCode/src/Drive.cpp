@@ -4,6 +4,7 @@
 #include "Screen.h"
 #include "pros/adi.h"
 #include "Drive.h"
+#include "globals.h"
 using namespace std;
 
 /* 

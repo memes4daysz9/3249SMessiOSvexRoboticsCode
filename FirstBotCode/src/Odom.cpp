@@ -1,7 +1,7 @@
 #include "main.h"
 #include "pros/screen.h"
 #include "Odom.h"
-
+#include "globals.h"
 
 
 	float diameter = 4.125f;//diameter of the omni wheels for distance measuring
