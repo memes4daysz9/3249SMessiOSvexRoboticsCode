@@ -36,7 +36,6 @@ const int triballAmount = 12; // the amount of triballs that will be shot from t
 bool RightSide;
 bool LeftSide;
 void initialize() {
-	pros::lcd::initialize();
 
 
 
@@ -44,7 +43,7 @@ void initialize() {
   pros::Task ScreenTask(ScreenStats); 
 
 
-	pros::lcd::initialize();
+	
 
 	
 	CurrentLog << "File started"; 

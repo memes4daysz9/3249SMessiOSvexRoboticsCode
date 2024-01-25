@@ -57,21 +57,22 @@ integral = integral + error
 float P;
 float I;
 float D;
-float PID;//voltage for the motors to use
+float Output;//voltage for the motors to use
 float error;// the distance from the target
-float lastError;// error from last loop
 float integral;
 float kD= 0.1;
 float kI= 0.1;
-float kP= 0.7;
+float kP= 0.1;
+float ka = 0.1;
 float target;//the target voltage for the PID to hit
 float CataMotorTemp;
 bool KILLMODE;
-
-
+int calculatedFlywheelRPM;
+int prevCalculatedFlywheelRPM;
+const int FlywheelGearRatio = 7;
 
 	while (true) {         // the while true Command
-		
+	calculatedFlywheelRPM = CataMotor.get_velocity() * FlywheelGearRatio;//7 is the gear multiplier
 	cPower = MainController.get_analog(ANALOG_LEFT_Y);
 	cTurn = MainController.get_analog(ANALOG_RIGHT_X);
 
@@ -80,17 +81,19 @@ bool KILLMODE;
 	if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){
 		CataMotor.set_voltage_limit(30000);//NOTE this is in mV meaning that its doing 30V.... and yes, PROS lets this happen and the motors smell alot
 		CataMotor.set_current_limit(5000);//2500mA is the normal amount
-		target = 30000;//sets the target voltage to 30 Volts, the normal amount is 12V
+		target = 3000;//sets the target RPM to 3000, which is 700 rpms more than normal
 	}else if (CataMotorTemp <= 55){
-		target = 8000;
+		target = 1500;
+	}else{
+		target = 2000;
 	}
-	error = target - PID;
-	integral = integral + error;
-	P = error * kP;
-	I = integral * kI;
-	D = (error - lastError)*kD;
 
-	PID = P+I+D;
+	int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM
+	float FF = Ki * sgn(calculatedFlywheelRPM) + kD * calculatedFlywheelRPM + Ka * accel; 
+	error = target - calculatedFlywheelRPM;
+	P = error * kP;
+
+	Output = P*FF;
 
 if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
 
@@ -106,9 +109,9 @@ if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
 
 
 if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
-	CataMotor.move_voltage(PID);
+	CataMotor.move_voltage(Output);
 }else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
-	CataMotor.move_voltage(-PID);
+	CataMotor.move_voltage(-Output);
 }else if(MainController.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
 	CataMotor.move_voltage(0);
 }
