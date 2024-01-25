@@ -54,25 +54,16 @@ D=(error-last error)*kD
 integral = integral + error
 */
 
-float P;
+
 float I;
 float D;
-float Output;//voltage for the motors to use
-float error;// the distance from the target
 float integral;
-float kD= 0.1;
-float kI= 0.1;
-float kP= 0.1;
-float ka = 0.1;
 float target;//the target voltage for the PID to hit
 float CataMotorTemp;
 bool KILLMODE;
-int calculatedFlywheelRPM;
-int prevCalculatedFlywheelRPM;
-const int FlywheelGearRatio = 7;
+
 
 	while (true) {         // the while true Command
-	calculatedFlywheelRPM = CataMotor.get_velocity() * FlywheelGearRatio;//7 is the gear multiplier
 	cPower = MainController.get_analog(ANALOG_LEFT_Y);
 	cTurn = MainController.get_analog(ANALOG_RIGHT_X);
 
@@ -88,12 +79,7 @@ const int FlywheelGearRatio = 7;
 		target = 2000;
 	}
 
-	int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM
-	float FF = Ki * sgn(calculatedFlywheelRPM) + kD * calculatedFlywheelRPM + Ka * accel; 
-	error = target - calculatedFlywheelRPM;
-	P = error * kP;
 
-	Output = P*FF;
 
 if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
 
@@ -109,11 +95,11 @@ if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
 
 
 if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
-	CataMotor.move_voltage(Output);
+	RunFlywheel(target);
 }else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
-	CataMotor.move_voltage(-Output);
+	RunFlywheel(-target);
 }else if(MainController.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-	CataMotor.move_voltage(0);
+	RunFlywheel(0);
 }
 
 

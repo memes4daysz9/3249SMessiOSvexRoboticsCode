@@ -122,3 +122,30 @@ while (true){//PID Loop W
     LastError = error;
     }
 } 
+
+void RunFlywheel(int target){
+pros::Motor CataMotor(5);
+int calculatedFlywheelRPM;
+int prevCalculatedFlywheelRPM;
+const int FlywheelGearRatio = 7;
+float kD= 0.1;
+float kI= 0.1;
+float kP= 0.1;
+float Ka = 0.1;
+float P;
+float Output;//voltage for the motors to use
+float error;// the distance from the target
+while (true){
+    calculatedFlywheelRPM = CataMotor.get_velocity() * FlywheelGearRatio;
+    int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM
+	float FF = Ki * sgn(calculatedFlywheelRPM) + kD * calculatedFlywheelRPM + Ka * accel; 
+	error = target - calculatedFlywheelRPM;
+	P = error * kP;
+
+	Output = P*FF;
+    CataMotor.move_voltage(Output);
+    if (target == 0){
+        CataMotor.move_voltage(0); // helps keep the motors not try to 
+    }
+    }
+}
