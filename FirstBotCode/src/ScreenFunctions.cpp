@@ -10,8 +10,9 @@ int AutonSide = NULL;
 void ScreenStats(){
     pros::ADIDigitalOut FirstWingMan(1 ,'a');
 	pros::ADIDigitalOut SecondWingMan(2 ,'b');
+    pros::Controller MainController(pros::E_CONTROLLER_MASTER); //port conifigs
 
-    pros::screen_touch_status_s_t TouchPos;
+    pros::screen_touch_status_s_t TouchPos; //auton selector
     pros::screen::set_pen(COLOR_RED);
     pros::screen::fill_rect(1,100,480,200);
     pros::screen::set_pen(COLOR_BLUE);
@@ -41,7 +42,7 @@ void ScreenStats(){
                     AutonSide = 4; // no matchload red
                 }
             }
-        pros::delay(100); //1/10 second updates
+        pros::delay(10); //1/10 second updates for a responsive touchscreen
         }else{
             
             pros::screen::set_pen(COLOR_BLACK);
@@ -52,6 +53,12 @@ void ScreenStats(){
             pros::screen::print(pros::TEXT_MEDIUM,3,"        Pnumatics");
             pros::screen::print(pros::TEXT_MEDIUM,4,"left:",FirstWingMan.get_value());
             pros::screen::print(pros::TEXT_MEDIUM,5,"right:",SecondWingMan.get_value());
+            //end Brain Screen func and now controller functions
+            if (calculatedFlywheelRPM >=100){
+                MainController.print(0,0,"RPM:",calculatedFlywheelRPM);
+            }else {MainController.clear();}
+            MainController.print(1,0,"LeftWing",FirstWingMan);
+            MainController.print(2,0,"RightWing",SecondWingMan);
             pros::delay(500); //half second updates
             
             
