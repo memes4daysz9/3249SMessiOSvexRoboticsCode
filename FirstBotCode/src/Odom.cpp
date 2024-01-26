@@ -124,6 +124,7 @@ while (true){//PID Loop W
 } 
 
 void RunFlywheel(int target){
+template <typename T>
 pros::Motor CataMotor(5);
 int calculatedFlywheelRPM;
 int prevCalculatedFlywheelRPM;
@@ -135,7 +136,12 @@ float Ka = 0.1;
 float P;
 float Output;//voltage for the motors to use
 float error;// the distance from the target
+int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
+
 while (true){
+    
     calculatedFlywheelRPM = CataMotor.get_velocity() * FlywheelGearRatio;
     int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM
 	float FF = Ki * sgn(calculatedFlywheelRPM) + kD * calculatedFlywheelRPM + Ka * accel; 
