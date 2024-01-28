@@ -4,7 +4,6 @@
 #include "Screen.h"
 #include "pros/adi.h"
 #include "Drive.h"
-#include "globals.h"
 using namespace std;
 
 /* 
@@ -130,7 +129,7 @@ if (KILLMODE == false){
  	FrontRightMotor.move(100*(((1-curve)*right)/100+(curve*pow(right/100,7))));
   	BackLeftMotor.move(100*(((1-curve)*left)/100+(curve*pow(left/100,7))));
  	BackRightMotor.move(100*(((1-curve)*right)/100+(curve*pow(right/100,7))));}
-	else if (KILLMODE ==  true){
+else if (KILLMODE ==  true){
 		FrontLeftMotor.move_voltage(30000 * left);
 		BackLeftMotor.move_voltage(30000 * left);
 		FrontRightMotor.move_voltage(30000 * right);
@@ -139,6 +138,6 @@ if (KILLMODE == false){
 
 
 		pros::delay(20); //delay for resource saving
-		lastError = error;
+		
 	}
 }

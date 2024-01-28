@@ -2,7 +2,6 @@
 #include "main.h"
 #include "Odom.h"
 #include "Auton.h"
-#include "gloabals.h"
 
 
 
@@ -11,7 +10,7 @@ void AutonRun(){
 	pros::ADIDigitalOut SecondWingMan(2 ,'b');
 	pros::Motor CataMotor(5);
 
-if(AutonSide = 1){
+if(AutonSide == 1){
 	
 Forward(5);
 Rotate(90);
@@ -27,14 +26,14 @@ RunFlywheel(1200);
 pros::delay(3000);
 RunFlywheel(0);
 
-}else if (AutonSide = 2){
+}else if (AutonSide == 2){
 //yes matchload blue
  Forward(5);
  Rotate(-135);
  FirstWingMan.set_value(HIGH);
  Forward(7);
  Rotate(225);
- Forward(6):
+ Forward(6);
  Rotate(90);
  SecondWingMan.set_value(HIGH);
  Forward(36);
@@ -49,7 +48,7 @@ RunFlywheel(1200);
 pros::delay(3000);
 RunFlywheel(0);
 
-}else if(AutonSide = 3){
+}else if(AutonSide == 3){
 //Red Yes matchload
 Forward(5);
 Rotate(-45);
@@ -71,7 +70,7 @@ RunFlywheel(1200);
 pros::delay(3000);
 RunFlywheel(0);
 
-}else if (AutonSide = 4){
+}else if (AutonSide == 4){
 
 Forward(5);
 Rotate(90);

@@ -1,7 +1,7 @@
 #include "main.h"
 #include "pros/screen.h"
 #include "Odom.h"
-#include "globals.h"
+#include "Screen.h"
 
 
 	float diameter = 4.125f;//diameter of the omni wheels for distance measuring
@@ -12,6 +12,18 @@
     float LeftMotorEncoder; // takes the encoder values from the the left motors and averages them
 
     float RightMotorEncoder; // takes the encoder values from the the left motors and averages them
+    
+    int calculatedFlywheelRPM;
+
+    int sgn(int val) {
+    if (val > 0){
+        return (1);
+    }else if (val < 0) {
+        return (-1);
+    }else {
+        return (0);
+    }
+}
 void  OdomTracking(){
     
     pros::Motor FrontLeftMotor(1);
@@ -20,8 +32,8 @@ void  OdomTracking(){
     pros::Motor BackRightMotor(4);
 
     while (true){
-        LeftMotorEncoder = (FrontLeftMotor.get_encoder_units() + BackLeftMotor.get_encoder_units()) / 2;
-        RightMotorEncoder = (FrontRightMotor.get_encoder_units() + BackRightMotor.get_encoder_units())/2;
+        LeftMotorEncoder = float(FrontLeftMotor.get_encoder_units() + BackLeftMotor.get_encoder_units()) / 2;
+        RightMotorEncoder = float(FrontRightMotor.get_encoder_units() + BackRightMotor.get_encoder_units())/2;
     
 
     }
@@ -124,26 +136,24 @@ while (true){//PID Loop W
 } 
 
 void RunFlywheel(int target){
-template <typename T>
+
 pros::Motor CataMotor(5);
-int calculatedFlywheelRPM;
+
 int prevCalculatedFlywheelRPM;
 const int FlywheelGearRatio = 7;
 float kD= 0.1;
-float kI= 0.1;
+float Ki= 0.1;
 float kP= 0.1;
 float Ka = 0.1;
 float P;
 float Output;//voltage for the motors to use
 float error;// the distance from the target
-int sgn(T val) {
-    return (T(0) < val) - (val < T(0));
-}
+
 
 while (true){
     
-    calculatedFlywheelRPM = CataMotor.get_velocity() * FlywheelGearRatio;
-    int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM
+    calculatedFlywheelRPM = CataMotor.get_actual_velocity() * FlywheelGearRatio;
+    int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM;
 	float FF = Ki * sgn(calculatedFlywheelRPM) + kD * calculatedFlywheelRPM + Ka * accel; 
 	error = target - calculatedFlywheelRPM;
 	P = error * kP;
@@ -153,5 +163,6 @@ while (true){
     if (target == 0){
         CataMotor.move_voltage(0); // helps keep the motors not try to 
     }
+    prevCalculatedFlywheelRPM = calculatedFlywheelRPM;
     }
 }

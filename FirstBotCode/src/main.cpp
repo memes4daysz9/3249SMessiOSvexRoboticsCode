@@ -4,9 +4,9 @@
 #include "Screen.h"
 #include "pros/adi.h"
 #include "Drive.h"
+#include "Auton.h"
 using namespace std;
 
-int AutonSide;
 const int triballAmount = 12; // the amount of triballs that will be shot from the pnumatics, normally this variable will be used once during auton
 
 
@@ -19,7 +19,7 @@ const int triballAmount = 12; // the amount of triballs that will be shot from t
 
 
 
-
+//sus
 
 
 
