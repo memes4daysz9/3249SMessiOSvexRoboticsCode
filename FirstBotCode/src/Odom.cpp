@@ -1,4 +1,5 @@
 #include "main.h"
+#include "pros/adi.hpp"
 #include "pros/screen.h"
 #include "Odom.h"
 #include "Screen.h"
@@ -12,7 +13,7 @@
     float LeftMotorEncoder; // takes the encoder values from the the left motors and averages them
 
     float RightMotorEncoder; // takes the encoder values from the the left motors and averages them
-    
+
     int calculatedFlywheelRPM;
 
     int sgn(int val) {
@@ -65,9 +66,9 @@ bool Forward(float WantedDistance){ //distance in inches
     float P;
     float I;
     float D;
-    float kP = 0.1;
-    float kI = 0.1;
-    float kD = 0.1;
+    float kP = 0.3;
+    float kI = 0.3;
+    float kD = 0.3;
     float error;
     float LastError;
     float PID;
@@ -107,9 +108,9 @@ bool Rotate(float DegreesToRotate){
 	float P;
     float I;
     float D;
-    float kP = 0.1;
-    float kI = 0.1;
-    float kD = 0.1;
+    float kP = 0.3;
+    float kI = 0.3;
+    float kD = 0.3;
     float error;
     float LastError;
     float PID;
@@ -141,28 +142,42 @@ pros::Motor CataMotor(5);
 
 int prevCalculatedFlywheelRPM;
 const int FlywheelGearRatio = 7;
-float kD= 0.1;
-float Ki= 0.1;
+float K;
+float kD= 0.3;
+float Ki= 0.3;
 float kP= 0.1;
-float Ka = 0.1;
+float Ka = 0.3;
 float P;
+float DT;// delta Target RPM
+int prevTarget; // for delta calculations
 float Output;//voltage for the motors to use
 float error;// the distance from the target
-
+float Time;
+float a;
+float DeadLength;
 
 while (true){
     
+
     calculatedFlywheelRPM = CataMotor.get_actual_velocity() * FlywheelGearRatio;
-    int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM;
+    int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM; //  glorified deltaRPM
 	float FF = Ki * sgn(calculatedFlywheelRPM) + kD * calculatedFlywheelRPM + Ka * accel; 
 	error = target - calculatedFlywheelRPM;
 	P = error * kP;
-
+    K = accel/DT;
+    a = K*(DeadLength/4)/Time;
+    kP = 1/a;
 	Output = P*FF;
     CataMotor.move_voltage(Output);
     if (target == 0){
         CataMotor.move_voltage(0); // helps keep the motors not try to 
     }
+    if(target > 0 && calculatedFlywheelRPM < 14){
+        DeadLength += 250; // every quarter second that the flywheel was supposed to go, add a quarter second to the count
+    }
+    pros::delay(250); // allows for deltas to properly work
     prevCalculatedFlywheelRPM = calculatedFlywheelRPM;
+    Time += 1;
+
     }
 }
