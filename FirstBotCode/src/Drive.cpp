@@ -74,6 +74,8 @@ bool KILLMODE;
 		target = 3000;//sets the target RPM to 3000, which is 700 rpms more than normal
 	}else if (CataMotorTemp <= 55){
 		target = 1500;
+	}else if(MainController.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+	RunFlywheel(0);
 	}else{
 		target = 2000;
 	}
