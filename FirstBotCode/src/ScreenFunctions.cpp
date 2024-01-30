@@ -30,7 +30,7 @@ void ScreenStats(){
     while (true){
         if ((autonSelected == false) || (AutonSide == 0)){
             if (TouchPos.y > 100){//blue Side
-                if (TouchPos.x < 240){
+                if (TouchPos.x < 240||MainController.get_deigital(DIGITAL_UP){
                     AutonSide = 1; // no matchloading blue
                 }else if (TouchPos.x > 240) {
                     AutonSide = 2; // yes matchloading blue
