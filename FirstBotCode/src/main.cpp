@@ -53,6 +53,7 @@ void initialize() {
 
 
 
+
 	pros::lcd::initialize();
 
 	pros::lcd::set_text(1, "Nerd");
@@ -225,15 +226,23 @@ float PID;//voltage for the motors to use
 float error;// the distance from the target
 float lastError;// error from last loop
 float integral;
-float kD= 0.5;
-float kI= 0.5;
-float kP= 0.5;
+float kD= 0.1;
+float kI= 1;
+float kP= 1.5;
 float target;//the target voltage for the PID to hit
 float CataMotorTemp;
+int calculatedFlywheelRPM;
 
 
 
-	while (true) {         // the while true Command
+	while (true) { 
+		calculatedFlywheelRPM = 7 * CataMotor.get_actual_velocity();
+		
+		if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)){
+			RightSide = true;
+		}else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){
+			LeftSide = true;
+		}
 		
 	cPower = MainController.get_analog(ANALOG_LEFT_Y);
 	cTurn = MainController.get_analog(ANALOG_RIGHT_X);
@@ -242,11 +251,11 @@ float CataMotorTemp;
 	right = cPower - cTurn;
 
 	if (CataMotorTemp <= 55){
-		target = 6000;
+		target = 1200;
 	}else if (CataMotorTemp >= 50){
-		target = 12000; // when it starts overheating, set the voltage higher to counter 
+		target = 24000; // when it starts overheating, set the voltage higher to counter 
 	}
-	error = target - PID;
+	error = target - calculatedFlywheelRPM;
 	integral = integral + error;
 	P = error * kP;
 	I = integral * kI;
