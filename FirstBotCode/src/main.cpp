@@ -40,7 +40,8 @@ void initialize() {
 
 
   pros::Task OdomTask(OdomTracking); //multithreading W
-  pros::Task ScreenTask(ScreenStats); 
+  pros::Task ScreenTask(ScreenStats);
+  pros::Task Flywheel(); 
 
 
 	

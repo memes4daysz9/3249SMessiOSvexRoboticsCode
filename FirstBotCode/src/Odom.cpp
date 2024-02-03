@@ -16,6 +16,10 @@
 
     int calculatedFlywheelRPM;
 
+    float kP;
+    float kI; // universals for DriveTrain PID
+    float kD;
+
     int sgn(int val) {
     if (val > 0){
         return (1);
@@ -24,7 +28,9 @@
     }else {
         return (0);
     }
+    
 }
+
 void  OdomTracking(){
     
     pros::Motor FrontLeftMotor(1);
@@ -32,11 +38,14 @@ void  OdomTracking(){
     pros::Motor BackLeftMotor(3);
     pros::Motor BackRightMotor(4);
 
+        float kP = 0.3;
+        float kI = 0.3;
+        float kD = 0.3;
     while (true){
         LeftMotorEncoder = float(FrontLeftMotor.get_encoder_units() + BackLeftMotor.get_encoder_units()) / 2;
         RightMotorEncoder = float(FrontRightMotor.get_encoder_units() + BackRightMotor.get_encoder_units())/2;
     
-
+        pros::delay(500);
     }
     
 
@@ -66,9 +75,6 @@ bool Forward(float WantedDistance){ //distance in inches
     float P;
     float I;
     float D;
-    float kP = 0.3;
-    float kI = 0.3;
-    float kD = 0.3;
     float error;
     float LastError;
     float PID;
@@ -143,10 +149,10 @@ pros::Motor CataMotor(5);
 int prevCalculatedFlywheelRPM;
 const int FlywheelGearRatio = 7;
 float K;
-float kD= 0.3;
-float Ki= 0.3;
-float kP= 0.1;
-float Ka = 0.3;
+float FkD= 0.3;
+float FKi= 0.3;
+float FkP= 0.1;
+float FKa = 0.3;
 float P;
 float DT;// delta Target RPM
 int prevTarget; // for delta calculations
@@ -155,18 +161,17 @@ float error;// the distance from the target
 float Time;
 float a;
 float DeadLength;
-CataMotor.move_voltage(1200000);
 while (true){
     
 
     calculatedFlywheelRPM = CataMotor.get_actual_velocity() * FlywheelGearRatio;
     int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM; //  glorified deltaRPM
-	float FF = Ki * sgn(calculatedFlywheelRPM) + kD * calculatedFlywheelRPM + Ka * accel; 
+	float FF = FKi * sgn(calculatedFlywheelRPM) + FkD * calculatedFlywheelRPM + FKa * accel; 
 	error = target - calculatedFlywheelRPM;
-	P = error * kP;
-    K = accel/DT;
+	P = 0;
+    K = 0;
     a = K*(DeadLength/4)/Time;
-    kP = 1/a;
+    FkP = 1/a;
 	Output = P*FF;
     CataMotor.move_voltage(Output);
     while (target == 0){
