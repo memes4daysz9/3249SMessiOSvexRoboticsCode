@@ -3,6 +3,8 @@
 #include "Odom.h"
 #include "Screen.h"
 #include "pros/adi.h"
+#include "pros/misc.h"
+#include "pros/screen.h"
 #include "Drive.h"
 using namespace std;
 
@@ -23,6 +25,11 @@ float cPower;
   	BackLeftMotor.move(forward,(100*(((1-curve)*left)/100+(curve*pow(left/100,7)))));
  	BackRightMotor.move(forward,(100*(((1-curve)*right)/100+(curve*pow(right/100,7)))));
  */ 
+    float FkD;
+    float FKi;
+    float FkP;//universals for FlywheelPID
+    float FKa;
+
 void opcontrol(){
 
 	pros::ADIDigitalOut FirstWingMan(1 ,'a');
@@ -61,26 +68,46 @@ float integral;
 float target;//the target voltage for the PID to hit
 float CataMotorTemp;
 bool KILLMODE;
-
+int prevCalculatedFlywheelRPM;
+const int FlywheelGearRatio = 7;
+float K;
+float P;
+float DT;// delta Target RPM
+int prevTarget; // for delta calculations
+float Output;//voltage for the motors to use
+float error;// the distance from the target
+float Time;
+float a;
+float DeadLength;
 
 	while (true) {         // the while true Command
-	cPower = MainController.get_analog(ANALOG_LEFT_Y);
-	cTurn = MainController.get_analog(ANALOG_RIGHT_X);
+	cTurn = MainController.get_analog(ANALOG_LEFT_Y);
+	cPower = MainController.get_analog(ANALOG_RIGHT_X);
 
 	left = cPower + cTurn;
 	right = cPower - cTurn;
-	if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){
+	if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){\
+		target = 3000;//sets the target RPM to 3000, which is 700 rpms more than normal
 		CataMotor.set_voltage_limit(30000);//NOTE this is in mV meaning that its doing 30V.... and yes, PROS lets this happen and the motors smell alot
 		CataMotor.set_current_limit(5000);//2500mA is the normal amount
-		target = 3000;//sets the target RPM to 3000, which is 700 rpms more than normal
-	}else if (CataMotorTemp <= 55){
-		target = 1500;
 	}else if(MainController.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-	RunFlywheel(0);
-	}else{
-		target = 2000;
+		target = 0;
 	}
-
+	    calculatedFlywheelRPM = CataMotor.get_actual_velocity() * FlywheelGearRatio;
+    int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM; //  glorified deltaRPM
+	float FF = 1 * sgn(calculatedFlywheelRPM) + 1 * calculatedFlywheelRPM + 1 * accel + 1000 * error; 
+	error = target - calculatedFlywheelRPM;
+	Output = FF;
+	if (target >= 1){
+    CataMotor.move_voltage(-Output);
+	MainController.print(0, 0, "running at %d",calculatedFlywheelRPM);
+	}else {
+		CataMotor.move_voltage(0);
+		MainController.print(0, 0, "stopped");
+	}
+	if (MainController.get_digital(DIGITAL_B)){
+		target = 0;
+	}
 
 
 if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
@@ -97,11 +124,12 @@ if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
 
 
 if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
-	RunFlywheel(target);
+	target = 2000;
+		
 }else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
-	RunFlywheel(-target);
+	target = -2000;
 }else if(MainController.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-	RunFlywheel(0);
+	target = 0;
 }
 
 

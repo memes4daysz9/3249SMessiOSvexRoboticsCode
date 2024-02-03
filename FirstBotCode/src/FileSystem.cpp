@@ -1,24 +1,32 @@
-#include "main.h"
+/*#include "main.h"
+#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include "Odom.h"
+#include "SaveTemplates.h"
 
+#define PIDMaxLines 7 // Maximum number of lines to read
+#define PID "PID"
 
-void WriteSaveConfig(string FilePath,string FileSave){
+void WriteSaveConfig(std::string FilePath,std::string WhatToSave){
+FILE* SaveFile;
 
-FILE* SaveFile = fopen(FilePath, w);
-fprintf(SaveFile, FileSave);
+if (WhatToSave == PID){
+SaveFile = fopen("/usd/RoboticsSaveFile/PID.Robo","r+");
+std::fprintf(SaveFile, PIDSave);
+}
+
 
 }
 
-string ReadSaveConfig(string FilePath, int LineNumber){
-
-FILE* ReadFile = fopen(FilePath, r);
+std::string ReadSaveConfig(std::string FilePath, int LineNumber){
+FILE* ReadFile;
+ReadFile = fopen("/usd/RoboticsSaveFile/PID.txt","r+");
 
     int lineCount;
     char line[PIDMaxLines][100]; // Array to store lines
 
-    while (fgets(line[lineCount], sizeof(line[lineCount]), file) != NULL && lineCount < MAX_LINES) {
+    while (fgets(line[lineCount], sizeof(line[lineCount]), ReadFile) != NULL && lineCount < PIDMaxLines) {
         lineCount++;
     }
     fclose(ReadFile);

@@ -2,6 +2,7 @@
 #include "pros/colors.h"
 #include "pros/screen.hpp"
 #include "Screen.h"
+#include "FileSys.h"
 
 int PixelPos = 0;
 bool autonSelected = false;
@@ -30,7 +31,7 @@ void ScreenStats(){
     while (true){
         if ((autonSelected == false) || (AutonSide == 0)){
             if (TouchPos.y > 100){//blue Side
-                if (TouchPos.x < 240||MainController.get_deigital(DIGITAL_UP){
+                if (TouchPos.x < 240||MainController.get_digital(DIGITAL_UP)){
                     AutonSide = 1; // no matchloading blue
                 }else if (TouchPos.x > 240) {
                     AutonSide = 2; // yes matchloading blue

@@ -8,7 +8,8 @@ extern float kI; // universals for DriveTrain PID
 extern float kD;
 
 
-extern float FkD= 0.3;
-extern float FKi= 0.3;
-extern float FkP= 0.1;//flywheel
-extern float FKa = 0.3;
+extern float FkD;
+extern float FKi;
+extern float FkP;//universals for FlywheelPID
+extern float FKa;
+    extern int sgn(int val);

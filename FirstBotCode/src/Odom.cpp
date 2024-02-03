@@ -3,6 +3,7 @@
 #include "pros/screen.h"
 #include "Odom.h"
 #include "Screen.h"
+#include "FileSys.h"
 
 
 	float diameter = 4.125f;//diameter of the omni wheels for distance measuring
@@ -20,16 +21,18 @@
     float kI; // universals for DriveTrain PID
     float kD;
 
-    int sgn(int val) {
+
+
+
+    
+int sgn(int val) {
     if (val > 0){
         return (1);
     }else if (val < 0) {
         return (-1);
     }else {
         return (0);
-    }
-    
-}
+    }}
 
 void  OdomTracking(){
     
@@ -149,10 +152,6 @@ pros::Motor CataMotor(5);
 int prevCalculatedFlywheelRPM;
 const int FlywheelGearRatio = 7;
 float K;
-float FkD= 0.3;
-float FKi= 0.3;
-float FkP= 0.1;
-float FKa = 0.3;
 float P;
 float DT;// delta Target RPM
 int prevTarget; // for delta calculations
@@ -168,18 +167,11 @@ while (true){
     int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM; //  glorified deltaRPM
 	float FF = FKi * sgn(calculatedFlywheelRPM) + FkD * calculatedFlywheelRPM + FKa * accel; 
 	error = target - calculatedFlywheelRPM;
-	P = 0;
-    K = 0;
-    a = K*(DeadLength/4)/Time;
-    FkP = 1/a;
 	Output = P*FF;
     CataMotor.move_voltage(Output);
     while (target == 0){
         CataMotor.move_voltage(0); // helps keep the motors not try to apply voltage to stop it
         Output = 0;
-    }
-    if(target > 0 && calculatedFlywheelRPM < 14){
-        DeadLength += 250; // every quarter second that the flywheel was supposed to go, add a quarter second to the count
     }
     pros::delay(250); // allows for deltas to properly work
     prevCalculatedFlywheelRPM = calculatedFlywheelRPM;
