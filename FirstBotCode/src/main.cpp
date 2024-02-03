@@ -85,10 +85,6 @@ AutonRun();
 
 
 
-void opcontrol() {
-	
-Allowdriving();
 
-	}
 
 
