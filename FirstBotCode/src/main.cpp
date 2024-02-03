@@ -1,4 +1,5 @@
 #include "main.h"
+#include "pros/misc.h"
 #include <iostream>
 #include <fstream>
 using namespace std;
@@ -226,14 +227,14 @@ float PID;//voltage for the motors to use
 float error;// the distance from the target
 float lastError;// error from last loop
 float integral;
-float kD= 0.1;
+float kD= 0.5;
 float kI= 1;
-float kP= 1.5;
+float kP= 1;
 float target;//the target voltage for the PID to hit
 float CataMotorTemp;
 int calculatedFlywheelRPM;
-
-
+int negativeValue = -14;
+bool RunFlywheel;
 
 	while (true) { 
 		calculatedFlywheelRPM = 7 * CataMotor.get_actual_velocity();
@@ -249,11 +250,25 @@ int calculatedFlywheelRPM;
 
 	left = cPower + cTurn;
 	right = cPower - cTurn;
+	if (error <= negativeValue){
+		pros::lcd::set_text(2, "true");
+		CataMotor.move_voltage(0);
+	}else if (RunFlywheel== true){
+		CataMotor.move_voltage(PID);
+	}
+
+
+
+	if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
+		RunFlywheel = true;
+	}else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+		RunFlywheel = false;
+	}
 
 	if (CataMotorTemp <= 55){
-		target = 1200;
+		target = 400;
 	}else if (CataMotorTemp >= 50){
-		target = 24000; // when it starts overheating, set the voltage higher to counter 
+		target = 800; // when it starts overheating, set the voltage higher to counter 
 	}
 	error = target - calculatedFlywheelRPM;
 	integral = integral + error;
@@ -276,13 +291,6 @@ if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
 }
 
 
-if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
-	CataMotor.move_voltage(PID);
-}else if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
-	CataMotor.move_voltage(-PID);
-}else {
-	(CataMotor.move_voltage(0));
-	}
 
 
 
