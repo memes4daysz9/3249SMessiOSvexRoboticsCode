@@ -41,6 +41,7 @@ void opcontrol(){
     pros::Motor BackLeftMotor(3);
     pros::Motor BackRightMotor(4);
 	pros::Motor CataMotor(5);
+	pros::Motor Intake(6);
 	 
 
 
@@ -83,7 +84,7 @@ float DeadLength;
 	while (true) {         // the while true Command
 	cTurn = MainController.get_analog(ANALOG_LEFT_Y);
 	cPower = MainController.get_analog(ANALOG_RIGHT_X);
-
+	Intake = MainController.get_analog(ANALOG_LEFT_X);
 	left = cPower + cTurn;
 	right = cPower - cTurn;
 	if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){\
