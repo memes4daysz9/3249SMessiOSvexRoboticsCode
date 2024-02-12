@@ -23,7 +23,7 @@ float cPower;
  */ 
     float FkD;
     float FKi;
-    float FkP;//universals for FlywheelPID
+    float FkP;//universals for FlywheelPIDFF
     float FKa;
 
 void opcontrol(){
@@ -32,6 +32,7 @@ void opcontrol(){
 	pros::ADIDigitalOut SecondWingMan(2 ,'b');
 
     pros::Controller MainController(pros::E_CONTROLLER_MASTER);
+	pros::Controller SideCon(pros::E_CONTROLLER_PARTNER);
 	pros::Motor FrontLeftMotor(1);
     pros::Motor FrontRightMotor(2);
     pros::Motor BackLeftMotor(3);
@@ -78,12 +79,16 @@ float error;// the distance from the target
 float Time;
 float a;
 float DeadLength;
-
+float Blocker;
 	while (true) {         // the while true Command
 
 	cTurn = MainController.get_analog(ANALOG_LEFT_Y);
 	cPower = MainController.get_analog(ANALOG_RIGHT_X);
-	Intake = MainController.get_analog(ANALOG_LEFT_X);
+	IntakePower = SideCon.get_analog(ANALOG_LEFT_Y);
+	BlockerPower = -SideCon.get_analog(ANALOG_RIGHT_Y);
+	LeftBlocker.move(100*(((1-curve)*BlockerPower)/100+(curve*pow(BlockerPower/100,7)))); // fine control for shotblocker and intake
+	RightBlocker.move(100*(((1-curve)*BlockerPower)/100+(curve*pow(BlockerPower/100,7))));
+	Intake.move(100*(((1-curve)*IntakePower)/100+(curve*pow(IntakePower/100,7))));
 	left = cPower + cTurn;
 	right = cPower - cTurn;
 	if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){\
@@ -97,8 +102,8 @@ float DeadLength;
     int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM; //  glorified deltaRPM
 	float FF = sgn(calculatedFlywheelRPM + target) * sgn(target)( 2 * calculatedFlywheelRPM + 3 * accel + 100 * error); //target is in the sgn to help get the flywheel intitally going, once the target is 0, itll stop and same for negatives
 	error = target - calculatedFlywheelRPM;
-	Output = FF;
-	MainController.print(0, 0, "running at %d",calculatedFlywheelRPM);
+	P = error * kD;
+	Output = FF*P;
 	if (target >= 1){
     CataMotor.move_voltage(-Output);
 	}else {

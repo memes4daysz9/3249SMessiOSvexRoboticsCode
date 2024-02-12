@@ -9,7 +9,7 @@ const int triballAmount = 12; // the amount of triballs that will be shot from t
 
 
 
-	ofstream CurrentLog ("/usd/LogData.txt"); // global functions/variables
+	
 	int pollingRate = 2000;
 
 
