@@ -44,7 +44,6 @@
 #include "Auton.h"
 #include "Drive.h"
 #include "FileSys.h"
-#include "globals.h"
 #include "Odom.h"
 #include "SaveTemplates.h"
 #include "Screen.h"

@@ -30,20 +30,7 @@ const int triballAmount = 12; // the amount of triballs that will be shot from t
  */
 bool RightSide;
 bool LeftSide;
-void initialize() {
 
-
-
-  pros::Task OdomTask(OdomTracking); //multithreading W
-  pros::Task ScreenTask(ScreenStats);
-
-
-
-	
-
-	
-	CurrentLog << "File started"; 
-}
 
 
 
