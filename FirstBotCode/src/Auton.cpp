@@ -1,17 +1,14 @@
-#include "Screen.h"
 #include "main.h"
-#include "Odom.h"
-#include "Auton.h"
 
 
 
-void AutonRun(){
+
+void autonomous(){
     pros::ADIDigitalOut FirstWingMan(1 ,'a');
 	pros::ADIDigitalOut SecondWingMan(2 ,'b');
 	pros::Motor CataMotor(5);
 
 if(AutonSide == 1){
-	
 Forward(5);
 Rotate(90);
 Forward(6);
@@ -85,7 +82,8 @@ RunFlywheel(1200);
 pros::delay(3000);
 RunFlywheel(0);
 }else{
-	Rotate(720);
+	Forward(10);
+
 }
 }
 

@@ -1,15 +1,24 @@
-extern void OdomTracking();
-extern bool Forward(float WantedDistance);
-extern bool Rotate(float DegreesToRotate); // must use an .h file for using a function multiple times
-extern void RunFlywheel(int target);//runs the flywheel at a certain target RPM
-
-extern float kP;
-extern float kI; // universals for DriveTrain PID
-extern float kD;
+#include "main.h"
 
 
-extern float FkD;
-extern float FKi;
-extern float FkP;//universals for FlywheelPID
-extern float FKa;
-    extern int sgn(int val);
+class Odom{
+    public:
+    float kP;
+    float kI; // universals for DriveTrain PID
+    float kD;
+
+
+    float FkD;
+    float FKi;
+    float FkP;//universals for FlywheelPID
+    float FKa;
+    Odom();
+    void OdomTracking();
+    bool Forward(float WantedDistance);
+    bool Rotate(float DegreesToRotate);
+    void RunFlywheel(int target);
+
+
+    int sgn(int val);
+}
+extern Odom Odom;

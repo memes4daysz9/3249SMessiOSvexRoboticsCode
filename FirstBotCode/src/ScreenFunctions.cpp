@@ -1,8 +1,6 @@
 #include "main.h"
-#include "pros/colors.h"
-#include "pros/screen.hpp"
-#include "Screen.h"
-#include "FileSys.h"
+
+
 
 int PixelPos = 0;
 bool autonSelected = false;

@@ -1,11 +1,7 @@
 #include "main.h"
-#include <fstream>
-#include "Odom.h"
-#include "Screen.h"
-#include "pros/adi.h"
-#include "pros/misc.h"
-#include "pros/screen.h"
-#include "Drive.h"
+
+
+
 using namespace std;
 
 /* 
@@ -42,6 +38,8 @@ void opcontrol(){
     pros::Motor BackRightMotor(4);
 	pros::Motor CataMotor(5);
 	pros::Motor Intake(6);
+	pros::Motor LeftBlocker(7);
+	pros::Motor RightBlocker(8);
 	 
 
 
@@ -58,7 +56,7 @@ float cPower;
 P=error *kP
 I=integral*kI
 D=(error-last error)*kD
-
+/
 integral = integral + error
 */
 
@@ -82,6 +80,7 @@ float a;
 float DeadLength;
 
 	while (true) {         // the while true Command
+
 	cTurn = MainController.get_analog(ANALOG_LEFT_Y);
 	cPower = MainController.get_analog(ANALOG_RIGHT_X);
 	Intake = MainController.get_analog(ANALOG_LEFT_X);
@@ -96,15 +95,14 @@ float DeadLength;
 	}
 	    calculatedFlywheelRPM = CataMotor.get_actual_velocity() * FlywheelGearRatio;
     int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM; //  glorified deltaRPM
-	float FF = 1 * sgn(calculatedFlywheelRPM) + 1 * calculatedFlywheelRPM + 1 * accel + 1000 * error; 
+	float FF = sgn(calculatedFlywheelRPM + target) * sgn(target)( 2 * calculatedFlywheelRPM + 3 * accel + 100 * error); //target is in the sgn to help get the flywheel intitally going, once the target is 0, itll stop and same for negatives
 	error = target - calculatedFlywheelRPM;
 	Output = FF;
+	MainController.print(0, 0, "running at %d",calculatedFlywheelRPM);
 	if (target >= 1){
     CataMotor.move_voltage(-Output);
-	MainController.print(0, 0, "running at %d",calculatedFlywheelRPM);
 	}else {
 		CataMotor.move_voltage(0);
-		MainController.print(0, 0, "stopped");
 	}
 	if (MainController.get_digital(DIGITAL_B)){
 		target = 0;

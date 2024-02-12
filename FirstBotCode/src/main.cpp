@@ -1,10 +1,5 @@
 #include "main.h"
-#include <fstream>
-#include "Odom.h"
-#include "Screen.h"
-#include "pros/adi.h"
-#include "Drive.h"
-#include "Auton.h"
+
 using namespace std;
 
 const int triballAmount = 12; // the amount of triballs that will be shot from the pnumatics, normally this variable will be used once during auton
@@ -76,11 +71,7 @@ void competition_initialize() {
 }
 
 
-void autonomous() {
-AutonRun();
 
-
-}
 
 
 

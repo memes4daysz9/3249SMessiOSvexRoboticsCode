@@ -1,9 +1,4 @@
 #include "main.h"
-#include "pros/adi.hpp"
-#include "pros/screen.h"
-#include "Odom.h"
-#include "Screen.h"
-#include "FileSys.h"
 
 
 	float diameter = 4.125f;//diameter of the omni wheels for distance measuring
@@ -24,8 +19,8 @@
 
 
 
-    
-int sgn(int val) {
+  
+odom::int sgn(int val) {
     if (val > 0){
         return (1);
     }else if (val < 0) {
@@ -34,7 +29,7 @@ int sgn(int val) {
         return (0);
     }}
 
-void  OdomTracking(){
+odom::void  OdomTracking(){
     
     pros::Motor FrontLeftMotor(1);
     pros::Motor FrontRightMotor(2);
@@ -53,7 +48,7 @@ void  OdomTracking(){
     
 
 }
-bool Forward(float WantedDistance){ //distance in inches
+odom::bool Forward(float WantedDistance){ //distance in inches
 	// for every 360degrees, the wheel will go its circumference
     bool TargetMet;
 	pros::Motor FrontLeftMotor(1);
@@ -103,7 +98,7 @@ while (true){//PID Loop W
     }
 
 }
-bool Rotate(float DegreesToRotate){
+odom::bool Rotate(float DegreesToRotate){
     
     bool TargetMet;
 	pros::Motor FrontLeftMotor(1);
@@ -145,7 +140,7 @@ while (true){//PID Loop W
     }
 } 
 
-void RunFlywheel(int target){
+odom::void RunFlywheel(int target){
 
 pros::Motor CataMotor(5);
 

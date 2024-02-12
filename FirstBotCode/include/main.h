@@ -41,6 +41,20 @@
  */
 //#include "okapi/api.hpp"
 //#include "pros/api_legacy.h"
+#include "Auton.h"
+#include "Drive.h"
+#include "FileSys.h"
+#include "globals.h"
+#include "Odom.h"
+#include "SaveTemplates.h"
+#include "Screen.h"
+#include "pros/adi.hpp"
+#include "pros/screen.h"
+#include "pros/adi.h"
+#include "pros/misc.h"
+#include <fstream>
+#include "pros/colors.h"
+#include "pros/screen.hpp"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do
