@@ -5,7 +5,7 @@ class Odom{
     public:
     float kP;
     float kI; // universals for DriveTrain PID
-    float kD;
+    float kD = 50;
 
 
     float FkD;
@@ -13,12 +13,13 @@ class Odom{
     float FkP;//universals for FlywheelPID
     float FKa;
     Odom();
-    void OdomTracking();
+    
     bool Forward(float WantedDistance);
     bool Rotate(float DegreesToRotate);
     void RunFlywheel(int target);
-
+    
 
     int sgn(int val);
-}
-extern Odom Odom;
+};
+extern void OdomTracking();
+extern Odom odom;

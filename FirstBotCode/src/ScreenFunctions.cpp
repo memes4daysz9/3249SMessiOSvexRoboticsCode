@@ -7,6 +7,7 @@ bool autonSelected = false;
 int AutonSide = 0;
 void competition_initialize() {
 	pros::screen_touch_status_s_t TouchPos; //auton selector
+    pros::Controller MainController(pros::E_CONTROLLER_MASTER);
     pros::screen::set_pen(COLOR_RED);
     pros::screen::fill_rect(1,100,480,200);
     pros::screen::set_pen(COLOR_BLUE);
@@ -21,17 +22,17 @@ void competition_initialize() {
     pros::screen::print(pros::E_TEXT_SMALL,120,75,"RedSideNoMatchLoading");
     pros::screen::print(pros::E_TEXT_SMALL,120,75, "Select Autonomous"); // screen is 480 by  240 pixels, meaning that half is at 240 by 100
     while (1){
-        TouchPos = pros::screen_touch_status();
+        TouchPos = pros::screen::touch_status();
                     if (TouchPos.y > 100){//blue Side
-                if (TouchPos.x < 240||MainController.get_digital(DIGITAL_UP)){
+                if (TouchPos.x < 240||(MainController.get_digital(DIGITAL_UP) && !MainController.get_digital(DIGITAL_B))){
                     AutonSide = 1; // no matchloading blue
-                }else if (TouchPos.x > 240) {
+                }else if (TouchPos.x > 240||(MainController.get_digital(DIGITAL_UP) && MainController.get_digital(DIGITAL_B))) {
                     AutonSide = 2; // yes matchloading blue
                 }
             }else if (TouchPos.y < 100){//red Side
-                if (TouchPos.x < 240){
+                if (TouchPos.x < 240||(MainController.get_digital(DIGITAL_DOWN) && MainController.get_digital(DIGITAL_B))){
                     AutonSide = 3; // yes matchload red
-                }else if (TouchPos.x > 240) {
+                }else if (TouchPos.x > 240||(MainController.get_digital(DIGITAL_DOWN) && !MainController.get_digital(DIGITAL_B))) {
                     AutonSide = 4; // no matchload red
                 }
         }

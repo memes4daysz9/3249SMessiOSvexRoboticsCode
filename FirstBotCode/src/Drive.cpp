@@ -80,8 +80,9 @@ float Time;
 float a;
 float DeadLength;
 float Blocker;
+float IntakePower;
+float BlockerPower;
 	while (true) {         // the while true Command
-
 	cTurn = MainController.get_analog(ANALOG_LEFT_Y);
 	cPower = MainController.get_analog(ANALOG_RIGHT_X);
 	IntakePower = SideCon.get_analog(ANALOG_LEFT_Y);
@@ -100,9 +101,9 @@ float Blocker;
 	}
 	    calculatedFlywheelRPM = CataMotor.get_actual_velocity() * FlywheelGearRatio;
     int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM; //  glorified deltaRPM
-	float FF = sgn(calculatedFlywheelRPM + target) * sgn(target)( 2 * calculatedFlywheelRPM + 3 * accel + 100 * error); //target is in the sgn to help get the flywheel intitally going, once the target is 0, itll stop and same for negatives
+	float FF = odom.sgn(calculatedFlywheelRPM + target) * odom.sgn(target)* ( 2 * calculatedFlywheelRPM + 3 * accel + 100 * error); //target is in the sgn to help get the flywheel intitally going, once the target is 0, itll stop and same for negatives
 	error = target - calculatedFlywheelRPM;
-	P = error * kD;
+	P = error * odom.kD;
 	Output = FF*P;
 	if (target >= 1){
     CataMotor.move_voltage(-Output);

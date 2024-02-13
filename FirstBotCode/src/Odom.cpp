@@ -20,7 +20,7 @@
 
 
   
-odom::int sgn(int val) {
+int Odom::sgn(int val) {
     if (val > 0){
         return (1);
     }else if (val < 0) {
@@ -29,7 +29,7 @@ odom::int sgn(int val) {
         return (0);
     }}
 
-odom::void  OdomTracking(){
+void OdomTracking(){
     
     pros::Motor FrontLeftMotor(1);
     pros::Motor FrontRightMotor(2);
@@ -48,7 +48,7 @@ odom::void  OdomTracking(){
     
 
 }
-odom::bool Forward(float WantedDistance){ //distance in inches
+bool Odom::Forward(float WantedDistance){ //distance in inches
 	// for every 360degrees, the wheel will go its circumference
     bool TargetMet;
 	pros::Motor FrontLeftMotor(1);
@@ -98,7 +98,7 @@ while (true){//PID Loop W
     }
 
 }
-odom::bool Rotate(float DegreesToRotate){
+bool Odom::Rotate(float DegreesToRotate){
     
     bool TargetMet;
 	pros::Motor FrontLeftMotor(1);
@@ -140,7 +140,7 @@ while (true){//PID Loop W
     }
 } 
 
-odom::void RunFlywheel(int target){
+void Odom::RunFlywheel(int target){
 
 pros::Motor CataMotor(5);
 
