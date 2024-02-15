@@ -1,5 +1,7 @@
 #include "main.h"
-
+#pragma once
+#ifndef ODOM_HPP
+#define ODOM_HPP
 
 class Odom{
     public:
@@ -22,4 +24,4 @@ class Odom{
     int sgn(int val);
 };
 extern void OdomTracking();
-extern Odom odom;
+#endif

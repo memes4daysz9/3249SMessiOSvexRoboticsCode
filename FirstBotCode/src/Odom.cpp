@@ -18,7 +18,9 @@
 
 
 
+Odom::Odom(){
 
+}
   
 int Odom::sgn(int val) {
     if (val > 0){
