@@ -30,7 +30,6 @@ void opcontrol(){
 
 	pros::ADIDigitalOut FirstWingMan(1 ,'a');
 	pros::ADIDigitalOut SecondWingMan(2 ,'b');
-
     pros::Controller MainController(pros::E_CONTROLLER_MASTER);
 	pros::Controller SideCon(pros::E_CONTROLLER_PARTNER);
 	pros::Motor FrontLeftMotor(1);
@@ -44,6 +43,10 @@ void opcontrol(){
 	 
 
 
+
+
+
+        
 
 
 float cPower;
@@ -83,8 +86,17 @@ float Blocker;
 float IntakePower;
 float BlockerPower;
 	while (true) {         // the while true Command
-	cTurn = MainController.get_analog(ANALOG_LEFT_Y);
-	cPower = MainController.get_analog(ANALOG_RIGHT_X);
+	                if ((MainController.get_digital(DIGITAL_UP) && !MainController.get_digital(DIGITAL_B))){
+                    AutonSide = 1; // no matchloading blue
+                }else if ((MainController.get_digital(DIGITAL_UP) && MainController.get_digital(DIGITAL_B))) {
+                    AutonSide = 2; // yes matchloading blue
+                }else if ((MainController.get_digital(DIGITAL_DOWN) && MainController.get_digital(DIGITAL_B))){
+                    AutonSide = 3; // yes matchload red
+                }else if ((MainController.get_digital(DIGITAL_DOWN) && !MainController.get_digital(DIGITAL_B))) {
+                    AutonSide = 4; // no matchload red
+                }
+	cTurn = MainController.get_analog(ANALOG_RIGHT_X);
+	cPower = MainController.get_analog(ANALOG_LEFT_Y);
 	IntakePower = SideCon.get_analog(ANALOG_LEFT_Y);
 	BlockerPower = -SideCon.get_analog(ANALOG_RIGHT_Y);
 	LeftBlocker.move(100*(((1-curve)*BlockerPower)/100+(curve*pow(BlockerPower/100,7)))); // fine control for shotblocker and intake

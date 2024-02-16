@@ -7,8 +7,7 @@ void autonomous(){
     pros::ADIDigitalOut FirstWingMan(1 ,'a');
 	pros::ADIDigitalOut SecondWingMan(2 ,'b');
 	pros::Motor CataMotor(5);
-
-if(AutonSide == 1){
+	
 odom.Forward(5);
 odom.Rotate(90);
 odom.Forward(6);
@@ -22,6 +21,8 @@ odom.Forward(24);
 odom.RunFlywheel(1200);
 pros::delay(3000);
 odom.RunFlywheel(0);
+
+/*if(AutonSide == 1){
 
 }else if (AutonSide == 2){
 //yes matchload blue
@@ -83,6 +84,6 @@ pros::delay(3000);
 odom.RunFlywheel(0);
 }else{
 	odom.Forward(10);
-}
+}*/
 }
 

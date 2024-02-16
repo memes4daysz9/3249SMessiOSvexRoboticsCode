@@ -30,6 +30,13 @@ int Odom::sgn(int val) {
     }else {
         return (0);
     }}
+int abs(float Value){
+    if(Value < 0){
+        return -Value;
+    }else {
+        return Value;
+    }
+}
 
 void OdomTracking(){
     
@@ -38,8 +45,8 @@ void OdomTracking(){
     pros::Motor BackLeftMotor(3);
     pros::Motor BackRightMotor(4);
 
-        float kP = 0.3;
-        float kI = 0.3;
+        float kP = 30;
+        float kI = 0.1;
         float kD = 0.3;
     while (true){
         LeftMotorEncoder = float(FrontLeftMotor.get_encoder_units() + BackLeftMotor.get_encoder_units()) / 2;
@@ -82,21 +89,21 @@ bool Odom::Forward(float WantedDistance){ //distance in inches
     float RightTarget;
     LeftTarget = AngleInDegrees + LeftMotorEncoder;
     RightTarget = AngleInDegrees + RightMotorEncoder;
-
-while (true){//PID Loop W
+    
+while (abs(error) > 50){//PID Loop W
     error = ((LeftTarget - LeftMotorEncoder) + (RightTarget - RightMotorEncoder))/2;
     P = error * kP;
     I = (I+error) *kI;
     D = (error-LastError)*kD; 
     PID = P + I + D;
-	FrontLeftMotor.move_voltage(-PID);
-	BackLeftMotor.move_voltage(-PID);
+	FrontLeftMotor.move_voltage(PID);
+	BackLeftMotor.move_voltage(PID);
 	FrontRightMotor.move_voltage(PID);
 	BackRightMotor.move_voltage(PID);
     
-    if (error <= 5){
-        return true;
     }
+    if (-(abs(error) > 50)){
+    return true;
     }
 
 }
