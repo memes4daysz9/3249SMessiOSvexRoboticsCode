@@ -16,12 +16,14 @@ class Odom{
     float FKa;
     Odom();
     
-    bool Forward(float WantedDistance);
-    bool Rotate(float DegreesToRotate);
+    void Forward(float WantedDistance);
+    void Rotate(float DegreesToRotate);
     void RunFlywheel(int target);
     
 
     int sgn(int val);
 };
+extern float RightMotorEncoder;
+extern float LeftMotorEncoder;
 extern void OdomTracking();
 #endif

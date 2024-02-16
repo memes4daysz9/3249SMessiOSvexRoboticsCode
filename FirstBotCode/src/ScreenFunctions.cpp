@@ -53,22 +53,16 @@ void ScreenStats(){
             pros::screen::set_pen(COLOR_BLACK);
             pros::screen::fill_rect(1,1,480,240); // this is after auton is selected
             pros::screen::set_pen(COLOR_WHITE);
-            pros::screen::print(pros::E_TEXT_MEDIUM,1,"flywheel RPM: ",calculatedFlywheelRPM);
-            pros::screen::print(pros::E_TEXT_MEDIUM,2,"Brain Battery:",pros::battery::get_capacity(),"ControllerBattery:",MainController.get_battery_level());
-            pros::screen::print(pros::E_TEXT_MEDIUM,3,"        Pnumatics");
-            pros::screen::print(pros::E_TEXT_MEDIUM,4,"left: %s",FirstWingMan);
-            pros::screen::print(pros::E_TEXT_MEDIUM,5,"right: %s",SecondWingMan);
+            pros::screen::print(pros::E_TEXT_LARGE,1,"flywheel RPM:  %d",calculatedFlywheelRPM);
+            pros::screen::print(pros::E_TEXT_LARGE,2,"Brain Battery:  %d",pros::battery::get_capacity());
+            pros::screen::print(pros::E_TEXT_LARGE,3,"ControllerBattery:  %d",MainController.get_battery_level())
+            pros::screen::print(pros::E_TEXT_LARGE,4,"Reft Side DriveTrain: %d",LeftMotorEncoder);
+            pros::screen::print(pros::E_TEXT_LARGE,5,"Right Side DriveTrain %d",RightMotorEncoder);
             //end Brain Screen func and now controller functions
-            if (calculatedFlywheelRPM >=100){
-                MainController.print(0,0,"RPM:",calculatedFlywheelRPM);
-                if (calculatedFlywheelRPM >= 1400){
-                        MainController.rumble(". .");
-                }else if (calculatedFlywheelRPM >= 1200){
-                        MainController.rumble("- - -");
-                }
+            if(AutonSide == 0){
+                MainController.print(0,0,"Autonomus Not Selected!");
             }
-            MainController.print(1,0,"LeftWing",FirstWingMan);
-            MainController.print(2,0,"RightWing",SecondWingMan);
+            MainController.print(0,0,"AutonSide:%d",AutonSide);
             pros::delay(500); //half second updates
             
 

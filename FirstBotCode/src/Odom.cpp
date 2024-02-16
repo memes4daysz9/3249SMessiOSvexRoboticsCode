@@ -6,11 +6,14 @@
 	float radius = diameter * 0.5;//radius of the omni wheel for distance measuring
 
 	float pi =  3.14;//just a shorter  pi for easier processing which is at 3.14
+
     float LeftMotorEncoder; // takes the encoder values from the the left motors and averages them
 
     float RightMotorEncoder; // takes the encoder values from the the left motors and averages them
 
     int calculatedFlywheelRPM;
+
+    const int Tolerance = 36;
 
     float kP;
     float kI; // universals for DriveTrain PID
@@ -57,7 +60,7 @@ void OdomTracking(){
     
 
 }
-bool Odom::Forward(float WantedDistance){ //distance in inches
+void Odom::Forward(float WantedDistance){ //distance in inches
 	// for every 360degrees, the wheel will go its circumference
     bool TargetMet;
 	pros::Motor FrontLeftMotor(1);
@@ -78,7 +81,7 @@ bool Odom::Forward(float WantedDistance){ //distance in inches
 	float distancePerDegree = circumference/360;
 
 	float AngleInDegrees = WantedDistance/distancePerDegree;// forwards angle movement
-
+    bool variablebug = false; //i belive this is the way to go about fixing 
     float P;
     float I;
     float D;
@@ -90,7 +93,7 @@ bool Odom::Forward(float WantedDistance){ //distance in inches
     LeftTarget = AngleInDegrees + LeftMotorEncoder;
     RightTarget = AngleInDegrees + RightMotorEncoder;
     
-while (abs(error) > 50){//PID Loop W
+while ((abs(error) > Tolerance) && variablebug){//PID Loop W
     error = ((LeftTarget - LeftMotorEncoder) + (RightTarget - RightMotorEncoder))/2;
     P = error * kP;
     I = (I+error) *kI;
@@ -100,11 +103,16 @@ while (abs(error) > 50){//PID Loop W
 	BackLeftMotor.move_voltage(PID);
 	FrontRightMotor.move_voltage(PID);
 	BackRightMotor.move_voltage(PID);
-    
+
+    pros::delay(20);
+
+    if (error == LastError){
+            variablebug = true;
+        }
+    LastError = error;
+
     }
-    if (-(abs(error) > 50)){
-    return true;
-    }
+
 
 }
 bool Odom::Rotate(float DegreesToRotate){
@@ -131,7 +139,7 @@ bool Odom::Rotate(float DegreesToRotate){
     float RightTarget;
     LeftTarget = -DegreesToMove + LeftMotorEncoder;
     RightTarget = DegreesToMove + RightMotorEncoder;
-while (true){//PID Loop W
+while (abs(error) > Tolerance){//PID Loop W
     error = ((LeftTarget - LeftMotorEncoder) + (RightTarget - RightMotorEncoder))/2;
     P = error * kP;
     I = (I+error) * kI;
@@ -142,9 +150,7 @@ while (true){//PID Loop W
 	FrontRightMotor.move_voltage(PID);
 	BackRightMotor.move_voltage(PID);
     
-    if (error < 5){
-        return true;
-    }
+    pros::delay(20);
     LastError = error;
     }
 } 
