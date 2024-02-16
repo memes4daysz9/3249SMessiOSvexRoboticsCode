@@ -23,7 +23,7 @@ class Odom{
 
     int sgn(int val);
 };
-extern float RightMotorEncoder;
-extern float LeftMotorEncoder;
+extern int RightMotorEncoder;
+extern int LeftMotorEncoder;
 extern void OdomTracking();
 #endif

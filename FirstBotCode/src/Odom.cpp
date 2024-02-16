@@ -7,9 +7,9 @@
 
 	float pi =  3.14;//just a shorter  pi for easier processing which is at 3.14
 
-    float LeftMotorEncoder; // takes the encoder values from the the left motors and averages them
+    int LeftMotorEncoder; // takes the encoder values from the the left motors and averages them
 
-    float RightMotorEncoder; // takes the encoder values from the the left motors and averages them
+    int RightMotorEncoder; // takes the encoder values from the the left motors and averages them
 
     int calculatedFlywheelRPM;
 
@@ -52,10 +52,8 @@ void OdomTracking(){
         float kI = 0.1;
         float kD = 0.3;
     while (true){
-        LeftMotorEncoder = float(FrontLeftMotor.get_encoder_units() + BackLeftMotor.get_encoder_units()) / 2;
-        RightMotorEncoder = float(FrontRightMotor.get_encoder_units() + BackRightMotor.get_encoder_units())/2;
-    
-        pros::delay(500);
+        LeftMotorEncoder = FrontLeftMotor.get_encoder_units() + BackLeftMotor.get_encoder_units() / 2;
+        RightMotorEncoder = FrontRightMotor.get_encoder_units() + BackRightMotor.get_encoder_units()/2;
     }
     
 
