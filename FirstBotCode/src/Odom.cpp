@@ -107,6 +107,7 @@ while ((abs(error) > Tolerance) && !variablebug){//PID Loop W
     pros::delay(20);
 
     if (error == LastError){
+            MainController.print(0,0,"PID Error!");
             variablebug = true;
         }
     LastError = error;
@@ -115,7 +116,7 @@ while ((abs(error) > Tolerance) && !variablebug){//PID Loop W
 
 
 }
-bool Odom::Rotate(float DegreesToRotate){
+void Odom::Rotate(float DegreesToRotate){
     
     bool TargetMet;
 	pros::Motor FrontLeftMotor(1);
@@ -126,6 +127,7 @@ bool Odom::Rotate(float DegreesToRotate){
 	float circumference =pi*diameter;
 	float DistanceToMoveOnCircumference = DegreesToRotate/360  * circumference;
 	float DegreesToMove = DistanceToMoveOnCircumference / diameter * 360;
+    bool variablebug = false; //i belive this is the way to go about fixing 
 	float P;
     float I;
     float D;
@@ -145,12 +147,16 @@ while (abs(error) > Tolerance){//PID Loop W
     I = (I+error) * kI;
     D = (error-LastError) * kD; 
     PID = P + I + D;
-	FrontLeftMotor.move_voltage(-PID);
-	BackLeftMotor.move_voltage(-PID);
-	FrontRightMotor.move_voltage(PID);
-	BackRightMotor.move_voltage(PID);
+	FrontLeftMotor.move_voltage(PID);
+	BackLeftMotor.move_voltage(PID);
+	FrontRightMotor.move_voltage(-PID);
+	BackRightMotor.move_voltage(-PID);
     
-    pros::delay(20);
+    pros::delay(20);    
+    if (error == LastError){
+            MainController.print(0,0,"PID Error!");
+            variablebug = true;
+    }
     LastError = error;
     }
 } 
