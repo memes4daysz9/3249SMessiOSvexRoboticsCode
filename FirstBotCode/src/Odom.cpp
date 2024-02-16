@@ -93,7 +93,7 @@ void Odom::Forward(float WantedDistance){ //distance in inches
     LeftTarget = AngleInDegrees + LeftMotorEncoder;
     RightTarget = AngleInDegrees + RightMotorEncoder;
     
-while ((abs(error) > Tolerance) && variablebug){//PID Loop W
+while ((abs(error) > Tolerance) && !variablebug){//PID Loop W
     error = ((LeftTarget - LeftMotorEncoder) + (RightTarget - RightMotorEncoder))/2;
     P = error * kP;
     I = (I+error) *kI;
