@@ -63,7 +63,7 @@ void ScreenStats(){
                 MainController.print(0,0,"Autonomus Not Selected!");
             }
             MainController.print(0,0,"AutonSide:%d",AutonSide);
-            pros::delay(500); //half second updates
+            pros::delay(10); //half second updates
             
 
             
