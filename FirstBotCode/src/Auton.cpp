@@ -7,6 +7,7 @@ void autonomous(){
     pros::ADIDigitalOut FirstWingMan(1 ,'a');
 	pros::ADIDigitalOut SecondWingMan(2 ,'b');
 	pros::Motor CataMotor(5);
+	pros::Task OdomTask(OdomTracking); //multithreading W
 	
 odom.Forward(5);
 odom.Rotate(90);

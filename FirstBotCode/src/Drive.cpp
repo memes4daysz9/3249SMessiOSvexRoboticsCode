@@ -27,7 +27,7 @@ float cPower;
     float FKa;
 
 void opcontrol(){
-
+	pros::Task OdomTask(OdomTracking); //multithreading W
 	pros::ADIDigitalOut FirstWingMan(1 ,'a');
 	pros::ADIDigitalOut SecondWingMan(2 ,'b');
     pros::Controller MainController(pros::E_CONTROLLER_MASTER);
