@@ -30,8 +30,8 @@ void opcontrol(){
 	pros::Task OdomTask(OdomTracking); //multithreading W
 	pros::ADIDigitalOut FirstWingMan(1 ,'a');
 	pros::ADIDigitalOut SecondWingMan(2 ,'b');
-    pros::Controller MainController(pros::E_CONTROLLER_MASTER);
-	pros::Controller SideCon(pros::E_CONTROLLER_PARTNER);
+    pros::Controller MainController(pros::E_CONTROLLER_MASTER);//main controller
+	pros::Controller SideCon(pros::E_CONTROLLER_PARTNER);//second controller
 	pros::Motor FrontLeftMotor(1);
     pros::Motor FrontRightMotor(2);
     pros::Motor BackLeftMotor(3);
@@ -70,7 +70,7 @@ float D;
 float integral;
 float target;//the target voltage for the PID to hit
 float CataMotorTemp;
-bool KILLMODE;
+bool KILLMODE;// dont worry bout it
 int prevCalculatedFlywheelRPM;
 const int FlywheelGearRatio = 7;
 float K;
@@ -97,13 +97,13 @@ float BlockerPower;
                 }
 	cTurn = MainController.get_analog(ANALOG_RIGHT_X);
 	cPower = MainController.get_analog(ANALOG_LEFT_Y);
-	IntakePower = SideCon.get_analog(ANALOG_LEFT_Y);
+	IntakePower = SideCon.get_analog(ANALOG_LEFT_Y);//controller analog thingies
 	BlockerPower = -SideCon.get_analog(ANALOG_RIGHT_Y);
 	LeftBlocker.move(100*(((1-curve)*BlockerPower)/100+(curve*pow(BlockerPower/100,7)))); // fine control for shotblocker and intake
 	RightBlocker.move(100*(((1-curve)*BlockerPower)/100+(curve*pow(BlockerPower/100,7))));
 	Intake.move(100*(((1-curve)*IntakePower)/100+(curve*pow(IntakePower/100,7))));
 	left = cPower + cTurn;
-	right = cPower - cTurn;
+	right = cPower - cTurn;//drivetrain fine tune part 1
 	if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){\
 		target = 3000;//sets the target RPM to 3000, which is 700 rpms more than normal
 		CataMotor.set_voltage_limit(30000);//NOTE this is in mV meaning that its doing 30V.... and yes, PROS lets this happen and the motors smell alot
@@ -114,7 +114,7 @@ float BlockerPower;
 	    calculatedFlywheelRPM = CataMotor.get_actual_velocity() * FlywheelGearRatio;
     int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM; //  glorified deltaRPM
 	float FF = odom.sgn(calculatedFlywheelRPM + target) * odom.sgn(target)* ( 2 * calculatedFlywheelRPM + 3 * accel + 100 * error); //target is in the sgn to help get the flywheel intitally going, once the target is 0, itll stop and same for negatives
-	error = target - calculatedFlywheelRPM;
+	error = target - calculatedFlywheelRPM;//another FF
 	P = error * odom.kD;
 	Output = FF*P;
 	if (target >= 1){
@@ -126,7 +126,7 @@ float BlockerPower;
 		target = 0;
 	}
 
-
+//im too tired for this... ask me questions if you wanna know something
 if (MainController.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
 
 	FirstWingMan.set_value(HIGH);

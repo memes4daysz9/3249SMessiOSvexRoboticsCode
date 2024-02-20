@@ -11,17 +11,17 @@
 
     int RightMotorEncoder; // takes the encoder values from the the left motors and averages them
 
-    int calculatedFlywheelRPM;
+    int calculatedFlywheelRPM;// calculates the rpm based on the gear ratio i added
 
-    const int Tolerance = 36;
+    const int Tolerance = 36;//fixed variable for the error to try to get the motors degrees in this range
 
-    float kP;
+    float kP; //nothin... this isnt here at all im not lazy...
     float kI; // universals for DriveTrain PID
     float kD;
 
 
 
-Odom::Odom(){
+Odom::Odom(){//calls the variables inside class
     float FkD;
     float FKi;
     float FkP;//universals for FlywheelPID
@@ -32,7 +32,7 @@ Odom::Odom(){
     float error;
 }
   
-int Odom::sgn(int val) {
+int Odom::sgn(int val) { //signum function
     if (val > 0){
         return (1);
     }else if (val < 0) {
@@ -40,7 +40,7 @@ int Odom::sgn(int val) {
     }else {
         return (0);
     }}
-int abs(float Value){
+int abs(float Value){//absolute value
     if(Value < 0){
         return -Value;
     }else {
@@ -48,7 +48,7 @@ int abs(float Value){
     }
 }
 
-void OdomTracking(){
+void OdomTracking(){ //tracks the motors without any limits because i said so
     
     pros::Motor FrontLeftMotor(1);
     pros::Motor FrontRightMotor(2);
@@ -73,7 +73,7 @@ void Odom::Forward(float WantedDistance){ //distance in inches
     pros::Motor BackLeftMotor(3);
     pros::Motor BackRightMotor(4);
 
-	FrontLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	FrontLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);//when told to stop. itll stay right where its at and not coast
 	BackLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	FrontRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	BackRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -81,16 +81,16 @@ void Odom::Forward(float WantedDistance){ //distance in inches
 
 
 
-	float circumference =pi*diameter;
+	float circumference =pi*diameter;//funny geometry calculation
 
-	float distancePerDegree = circumference/360;
+	float distancePerDegree = circumference/360;//more funny calculations
 
 	float AngleInDegrees = WantedDistance/distancePerDegree;// forwards angle movement
-    bool variablebug = false; //i belive this is the way to go about fixing 
+    bool variablebug = false; //i belive this is the way to go about fixing funny variables... dunno how it does it but it does it
     float P;
     float I;
     float D;
-    float LastError;
+    float LastError;//gets the error from the last loop
     float LeftTarget;
     float RightTarget;
     LeftTarget = AngleInDegrees + LeftMotorEncoder;
@@ -100,26 +100,26 @@ while ((abs(error) > Tolerance) && !variablebug){//PID Loop W
     error = ((LeftTarget - LeftMotorEncoder) + (RightTarget - RightMotorEncoder))/2;
     P = error * kP;
     I = (I+error) *kI;
-    D = (error-LastError)*kD; 
+    D = (error-LastError)*kD; //PID live time Calculation
     PID = P + I + D;
 	FrontLeftMotor.move_voltage(PID);
 	BackLeftMotor.move_voltage(PID);
 	FrontRightMotor.move_voltage(PID);
 	BackRightMotor.move_voltage(PID);
 
-    pros::delay(20);
+    pros::delay(20);// delays the loop from calling everything else, helps to keep things cool inside the brain and saves battery
 
-    if (error == LastError){
+    if (error == LastError){//helps fix stuf
             MainController.print(0,0,"PID Error!");
             variablebug = true;
         }
-    LastError = error;
+    LastError = error;//haha heres where it gets the last error
 
     }
 
 
 }
-void Odom::Rotate(float DegreesToRotate){
+void Odom::Rotate(float DegreesToRotate){//you spin me right round baby right round like a record baby round round round round
     
     bool TargetMet;
 	pros::Motor FrontLeftMotor(1);
@@ -127,7 +127,7 @@ void Odom::Rotate(float DegreesToRotate){
     pros::Motor BackLeftMotor(3);
     pros::Motor BackRightMotor(4);
 
-	float circumference =pi*diameter;
+	float circumference =pi*diameter;//weird turning calculations
 	float DistanceToMoveOnCircumference = DegreesToRotate/360  * circumference;
 	float DegreesToMove = DistanceToMoveOnCircumference / diameter * 360;
     bool variablebug = false; //i belive this is the way to go about fixing 
@@ -142,7 +142,7 @@ void Odom::Rotate(float DegreesToRotate){
     float RightTarget;
     LeftTarget = -DegreesToMove + LeftMotorEncoder;
     RightTarget = DegreesToMove + RightMotorEncoder;
-while (abs(error) > Tolerance){//PID Loop W
+while ((abs(error) > Tolerance )&& !variablebug){//PID Loop W
     error = ((LeftTarget - LeftMotorEncoder) + (RightTarget - RightMotorEncoder))/2;
     P = error * kP;
     I = (I+error) * kI;
@@ -166,8 +166,8 @@ void Odom::RunFlywheel(int target){
 
 pros::Motor CataMotor(5);
 
-int prevCalculatedFlywheelRPM;
-const int FlywheelGearRatio = 7;
+int prevCalculatedFlywheelRPM;//different PID only its now just a P and no I and D
+const int FlywheelGearRatio = 7; //look here it is!
 float K;
 float P;
 float DT;// delta Target RPM
@@ -180,13 +180,13 @@ float DeadLength;
 while (true){
     
 
-    calculatedFlywheelRPM = CataMotor.get_actual_velocity() * FlywheelGearRatio;
+    calculatedFlywheelRPM = CataMotor.get_actual_velocity() * FlywheelGearRatio;//calc for flywheel rpm
     int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM; //  glorified deltaRPM
-	float FF = FKi * sgn(calculatedFlywheelRPM) + FkD * calculatedFlywheelRPM + FKa * accel; 
-	error = target - calculatedFlywheelRPM;
-	Output = P*FF;
+	float FF = FKi * sgn(calculatedFlywheelRPM) + FkD * calculatedFlywheelRPM + FKa * accel;  //FF calc(cant say what it is lmao)
+	error = target - calculatedFlywheelRPM;//error
+	Output = P*FF;//motor output
     CataMotor.move_voltage(Output);
-    while (target == 0){
+    while (target == 0){//cool motor cooling feature when not needed
         CataMotor.move_voltage(0); // helps keep the motors not try to apply voltage to stop it
         Output = 0;
     }

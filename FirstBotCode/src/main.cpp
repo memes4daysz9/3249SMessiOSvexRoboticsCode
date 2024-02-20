@@ -5,7 +5,7 @@ using namespace std;
 const int triballAmount = 12; // the amount of triballs that will be shot from the pnumatics, normally this variable will be used once during auton
 
 
-
+//this is dead i couldnt care less to fix this all up. alot of it is scrap code that diddnt make the cut once i went multi file
 
 
 

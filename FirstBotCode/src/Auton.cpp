@@ -1,13 +1,12 @@
 #include "main.h"
 
-Odom odom;
+Odom odom; //calls the object
 
 
-void autonomous(){
+void autonomous(){ //auton function
     pros::ADIDigitalOut FirstWingMan(1 ,'a');
 	pros::ADIDigitalOut SecondWingMan(2 ,'b');
 	pros::Motor CataMotor(5);
-	pros::Task OdomTask(OdomTracking); //multithreading W
 	
 
 
@@ -28,6 +27,7 @@ pros::delay(3000);
 odom.RunFlywheel(0);
 }else if (AutonSide == 2){
 //yes matchload blue
+pros::Task AutonPoll(AutonStats);
  odom.Forward(5);
  odom.Rotate(-135);
  FirstWingMan.set_value(HIGH);
@@ -50,6 +50,7 @@ odom.RunFlywheel(0);
 
 }else if(AutonSide == 3){
 //Red Yes matchload
+pros::Task AutonPoll(AutonStats);
 odom.Forward(5);
 odom.Rotate(-45);
 FirstWingMan.set_value(HIGH);
@@ -71,7 +72,8 @@ pros::delay(3000);
 odom.RunFlywheel(0);
 
 }else if (AutonSide == 4){
-
+	//red no matchload
+pros::Task AutonPoll(AutonStats);
 odom.Forward(5);
 odom.Rotate(90);
 odom.Forward(6);

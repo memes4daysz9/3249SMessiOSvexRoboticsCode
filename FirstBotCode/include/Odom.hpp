@@ -5,23 +5,23 @@
 
 class Odom{
     public:
-    float kP;
-    float kI; // universals for DriveTrain PID
-    float kD = 50;
+    float kP; // progressive for drivetrain PID.. how much it wants to go up
+    float kI; // interval for DriveTrain PID.. how much does it wanna move up and down exponentially
+    float kD = 50; // tries to prevent it needing to go down
 
 
     float FkD;
-    float FKi;
+    float FKi;//flywheels info tbh idk what they do all i know is they it works
     float FkP;//universals for FlywheelPID
     float FKa;
-    int RightMotorEncoder;
+    int RightMotorEncoder;//encoders from motors to be used in multiple files
     int LeftMotorEncoder;
-    float error;
-    Odom();
+    float error; // difference between where its supposed to be compared to where it actually wants to be
+    Odom();//calls the class to call variables
     
-    void Forward(float WantedDistance);
-    void Rotate(float DegreesToRotate);
-    void RunFlywheel(int target);
+    void Forward(float WantedDistance);//function for going forward
+    void Rotate(float DegreesToRotate);//function for turning in degrees because radians are weird
+    void RunFlywheel(int target); // runs the flywheel using the target
     
 
     int sgn(int val);
