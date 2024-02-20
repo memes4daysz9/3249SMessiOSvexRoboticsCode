@@ -9,6 +9,10 @@ void autonomous(){
 	pros::Motor CataMotor(5);
 	pros::Task OdomTask(OdomTracking); //multithreading W
 	
+
+
+if(AutonSide == 1){
+	pros::Task AutonPoll(AutonStats);
 odom.Forward(5);
 odom.Rotate(90);
 odom.Forward(6);
@@ -22,9 +26,6 @@ odom.Forward(24);
 odom.RunFlywheel(1200);
 pros::delay(3000);
 odom.RunFlywheel(0);
-
-/*if(AutonSide == 1){
-
 }else if (AutonSide == 2){
 //yes matchload blue
  odom.Forward(5);
@@ -85,6 +86,6 @@ pros::delay(3000);
 odom.RunFlywheel(0);
 }else{
 	odom.Forward(10);
-}*/
+}
 }
 

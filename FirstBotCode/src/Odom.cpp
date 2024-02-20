@@ -22,7 +22,14 @@
 
 
 Odom::Odom(){
-
+    float FkD;
+    float FKi;
+    float FkP;//universals for FlywheelPID
+    float FKa;
+    int RightMotorEncoder;
+    int LeftMotorEncoder;
+    float PID;
+    float error;
 }
   
 int Odom::sgn(int val) {
@@ -83,9 +90,7 @@ void Odom::Forward(float WantedDistance){ //distance in inches
     float P;
     float I;
     float D;
-    float error;
     float LastError;
-    float PID;
     float LeftTarget;
     float RightTarget;
     LeftTarget = AngleInDegrees + LeftMotorEncoder;
@@ -132,9 +137,7 @@ void Odom::Rotate(float DegreesToRotate){
     float kP = 0.3;
     float kI = 0.3;
     float kD = 0.3;
-    float error;
     float LastError;
-    float PID;
     float LeftTarget;
     float RightTarget;
     LeftTarget = -DegreesToMove + LeftMotorEncoder;

@@ -1,7 +1,7 @@
 #include "main.h"
 using namespace std;
 void initialize() {
-    
+    pros::lcd::initialize();
     pros::Task OdomTask(OdomTracking); //multithreading W
     pros::Task ScreenTask(ScreenStats);
     pros::ADIDigitalOut FirstWingMan(1 ,'a');

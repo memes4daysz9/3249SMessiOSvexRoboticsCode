@@ -14,6 +14,9 @@ class Odom{
     float FKi;
     float FkP;//universals for FlywheelPID
     float FKa;
+    int RightMotorEncoder;
+    int LeftMotorEncoder;
+    float error;
     Odom();
     
     void Forward(float WantedDistance);
@@ -23,7 +26,6 @@ class Odom{
 
     int sgn(int val);
 };
-extern int RightMotorEncoder;
-extern int LeftMotorEncoder;
+
 extern void OdomTracking();
 #endif
