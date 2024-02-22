@@ -86,6 +86,7 @@ float Blocker;
 float IntakePower;
 float BlockerPower;
 	while (true) {         // the while true Command
+	while (AutonSide == 0){
 	                if ((MainController.get_digital(DIGITAL_UP) && !MainController.get_digital(DIGITAL_B))){
                     AutonSide = 1; // no matchloading blue
                 }else if ((MainController.get_digital(DIGITAL_UP) && MainController.get_digital(DIGITAL_B))) {
@@ -95,6 +96,7 @@ float BlockerPower;
                 }else if ((MainController.get_digital(DIGITAL_DOWN) && !MainController.get_digital(DIGITAL_B))) {
                     AutonSide = 4; // no matchload red
                 }
+	}
 	cTurn = MainController.get_analog(ANALOG_RIGHT_X);
 	cPower = MainController.get_analog(ANALOG_LEFT_Y);
 	IntakePower = SideCon.get_analog(ANALOG_LEFT_Y);//controller analog thingies

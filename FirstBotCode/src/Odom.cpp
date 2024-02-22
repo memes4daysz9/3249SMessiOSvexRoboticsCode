@@ -47,7 +47,18 @@ int abs(float Value){//absolute value
         return Value;
     }
 }
+void ClearTrackers(){//resets the positions
+    pros::Motor FrontLeftMotor(1);
+    pros::Motor FrontRightMotor(2);
+    pros::Motor BackLeftMotor(3);
+    pros::Motor BackRightMotor(4);
 
+
+    FrontLeftMotor.tare_position();
+    FrontRightMotor.tare_position();
+    BackLeftMotor.tare_position();
+    BackRightMotor.tare_position();
+}
 void OdomTracking(){ //tracks the motors without any limits because i said so
     
     pros::Motor FrontLeftMotor(1);
@@ -59,8 +70,8 @@ void OdomTracking(){ //tracks the motors without any limits because i said so
         float kI = 0.1;
         float kD = 0.3;
     while (true){
-        LeftMotorEncoder = FrontLeftMotor.get_encoder_units() + BackLeftMotor.get_encoder_units() / 2;
-        RightMotorEncoder = FrontRightMotor.get_encoder_units() + BackRightMotor.get_encoder_units()/2;
+        LeftMotorEncoder = FrontLeftMotor.get_position() + BackLeftMotor.get_position() / 2;
+        RightMotorEncoder = FrontRightMotor.get_position() + BackRightMotor.get_position()/2;
     }
     
 
@@ -91,16 +102,15 @@ void Odom::Forward(float WantedDistance){ //distance in inches
     float I;
     float D;
     float LastError;//gets the error from the last loop
-    float LeftTarget;
-    float RightTarget;
-    LeftTarget = AngleInDegrees + LeftMotorEncoder;
-    RightTarget = AngleInDegrees + RightMotorEncoder;
+    ClearTrackers();
+    odom.LeftTarget = AngleInDegrees + odom.LeftMotorEncoder;
+    odom.RightTarget = AngleInDegrees + odom.RightMotorEncoder;
     
 while ((abs(error) > Tolerance) && !variablebug){//PID Loop W
-    error = ((LeftTarget - LeftMotorEncoder) + (RightTarget - RightMotorEncoder))/2;
-    P = error * kP;
-    I = (I+error) *kI;
-    D = (error-LastError)*kD; //PID live time Calculation
+    odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
+    P = error * kP;//100 - 300
+    I = (I+odom.error) *kI;
+    D = (odom.error-LastError)*kD; //PID live time Calculation
     PID = P + I + D;
 	FrontLeftMotor.move_voltage(PID);
 	BackLeftMotor.move_voltage(PID);
@@ -109,11 +119,11 @@ while ((abs(error) > Tolerance) && !variablebug){//PID Loop W
 
     pros::delay(20);// delays the loop from calling everything else, helps to keep things cool inside the brain and saves battery
 
-    if (error == LastError){//helps fix stuf
+    if (odom.error == LastError){//helps fix stuf
             MainController.print(0,0,"PID Error!");
             variablebug = true;
         }
-    LastError = error;//haha heres where it gets the last error
+    LastError = odom.error;//haha heres where it gets the last error
 
     }
 
@@ -138,15 +148,14 @@ void Odom::Rotate(float DegreesToRotate){//you spin me right round baby right ro
     float kI = 0.3;
     float kD = 0.3;
     float LastError;
-    float LeftTarget;
-    float RightTarget;
-    LeftTarget = -DegreesToMove + LeftMotorEncoder;
-    RightTarget = DegreesToMove + RightMotorEncoder;
+    ClearTrackers();
+    odom.LeftTarget = -DegreesToMove + odom.LeftMotorEncoder;//fixes any clearing problems is there is any
+    odom.RightTarget = DegreesToMove + odom.RightMotorEncoder;
 while ((abs(error) > Tolerance )&& !variablebug){//PID Loop W
-    error = ((LeftTarget - LeftMotorEncoder) + (RightTarget - RightMotorEncoder))/2;
-    P = error * kP;
-    I = (I+error) * kI;
-    D = (error-LastError) * kD; 
+    odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
+    P = odom.error * kP;
+    I = (I+odom.error) * kI;
+    D = (odom.error-LastError) * kD; 
     PID = P + I + D;
 	FrontLeftMotor.move_voltage(PID);
 	BackLeftMotor.move_voltage(PID);
@@ -154,11 +163,11 @@ while ((abs(error) > Tolerance )&& !variablebug){//PID Loop W
 	BackRightMotor.move_voltage(-PID);
     
     pros::delay(20);    
-    if (error == LastError){
+    if (odom.error == LastError){
             MainController.print(0,0,"PID Error!");
             variablebug = true;
     }
-    LastError = error;
+    LastError = odom.error;
     }
 } 
 
@@ -174,7 +183,6 @@ float DT;// delta Target RPM
 int prevTarget; // for delta calculations
 float Output;//voltage for the motors to use
 float error;// the distance from the target
-float Time;
 float a;
 float DeadLength;
 while (true){
@@ -183,7 +191,7 @@ while (true){
     calculatedFlywheelRPM = CataMotor.get_actual_velocity() * FlywheelGearRatio;//calc for flywheel rpm
     int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM; //  glorified deltaRPM
 	float FF = FKi * sgn(calculatedFlywheelRPM) + FkD * calculatedFlywheelRPM + FKa * accel;  //FF calc(cant say what it is lmao)
-	error = target - calculatedFlywheelRPM;//error
+	odom.error = target - calculatedFlywheelRPM;//error
 	Output = P*FF;//motor output
     CataMotor.move_voltage(Output);
     while (target == 0){//cool motor cooling feature when not needed
@@ -192,7 +200,6 @@ while (true){
     }
     pros::delay(250); // allows for deltas to properly work
     prevCalculatedFlywheelRPM = calculatedFlywheelRPM;
-    Time += 1;
 
     }
 }

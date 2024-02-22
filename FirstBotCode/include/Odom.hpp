@@ -16,6 +16,8 @@ class Odom{
     float FKa;
     int RightMotorEncoder;//encoders from motors to be used in multiple files
     int LeftMotorEncoder;
+    float LeftTarget;
+    float RightTarget;
     float error; // difference between where its supposed to be compared to where it actually wants to be
     Odom();//calls the class to call variables
     
