@@ -126,6 +126,10 @@ while ((abs(error) > Tolerance) && !variablebug){//PID Loop W
     LastError = odom.error;//haha heres where it gets the last error
 
     }
+    FrontLeftMotor.brake();
+    BackLeftMotor.brake();
+    FrontRightMotor.brake();
+    BackRightMotor.brake();
 
 
 }
@@ -136,6 +140,11 @@ void Odom::Rotate(float DegreesToRotate){//you spin me right round baby right ro
     pros::Motor FrontRightMotor(2);
     pros::Motor BackLeftMotor(3);
     pros::Motor BackRightMotor(4);
+
+    FrontLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);//when told to stop. itll stay right where its at and not coast
+	BackLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	FrontRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	BackRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
 	float circumference =pi*diameter;//weird turning calculations
 	float DistanceToMoveOnCircumference = DegreesToRotate/360  * circumference;
@@ -169,6 +178,10 @@ while ((abs(error) > Tolerance )&& !variablebug){//PID Loop W
     }
     LastError = odom.error;
     }
+    FrontLeftMotor.brake();
+    BackLeftMotor.brake();
+    FrontRightMotor.brake();
+    BackRightMotor.brake();
 } 
 
 void Odom::RunFlywheel(int target){
