@@ -179,10 +179,10 @@ while (abs(error) > Tolerance ){//PID Loop W
     anotherPID = odom.PID;
     right = -anotherPID;
     left = odom.PID;
-	FrontLeftMotor.move_voltage(maxVolt*(((1-curve)*left)/maxVolt+(curve*pow(left/maxVolt,7))));
-	BackLeftMotor.move_voltage(maxVolt*(((1-curve)*left)/maxVolt+(curve*pow(left/maxVolt,7))));//doesnt actually mean the max voltage, just a variable name 
-	FrontRightMotor.move_voltage(maxVolt*(((1-curve)*right)/maxVolt+(curve*pow(right/maxVolt,7))));
-	BackRightMotor.move_voltage(maxVolt*(((1-curve)*right)/maxVolt+(curve*pow(right/maxVolt,7))));
+	FrontLeftMotor.move_voltage(maxVolt*(((1-curve)*left)/maxVolt+(curve*pow(left/maxVolt,7)))+1200);
+	BackLeftMotor.move_voltage(maxVolt*(((1-curve)*left)/maxVolt+(curve*pow(left/maxVolt,7)))+1200);//doesnt actually mean the max voltage, just a variable name 
+	FrontRightMotor.move_voltage(maxVolt*(((1-curve)*right)/maxVolt+(curve*pow(right/maxVolt,7)))+1200);
+	BackRightMotor.move_voltage(maxVolt*(((1-curve)*right)/maxVolt+(curve*pow(right/maxVolt,7)))+1200);
     
     pros::delay(20);    
     if (odom.error == LastError){
