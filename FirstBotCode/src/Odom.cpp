@@ -104,7 +104,7 @@ while ((abs(error) > Tolerance)){//PID Loop W
     odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
     P = error * 32.5;
     I = (I+odom.error) *0.1;
-    D = (error - LastError) * 3;
+    D = (odom.error - LastError) * 3;
     pros::screen::print(pros::E_TEXT_MEDIUM,10,"Individual PID Values %f,%f,%f",P,I,D);
     odom.PID = P + I + D;
 	FrontLeftMotor.move_voltage(odom.PID);
