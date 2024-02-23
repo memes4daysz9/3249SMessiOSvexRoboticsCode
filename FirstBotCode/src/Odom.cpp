@@ -104,7 +104,7 @@ while ((abs(error) > Tolerance)){//PID Loop W
     odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
     P = error * 32.5;
     I = (I+odom.error) *0.1;
-    D = (odom.error-LastError)*10; //PID live time Calculation
+    D = (error - LastError) * 3;
     pros::screen::print(pros::E_TEXT_MEDIUM,10,"Individual PID Values %f,%f,%f",P,I,D);
     odom.PID = P + I + D;
 	FrontLeftMotor.move_voltage(odom.PID);
@@ -174,7 +174,7 @@ while (abs(error) > Tolerance ){//PID Loop W
     odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
     P = odom.error * 10;
     I = (I+odom.error) * 0.1;
-    D = (odom.error-LastError) * 3; 
+    D = (error - LastError) * 3;
     PID = P + I + D;
     anotherPID = odom.PID;
     right = -anotherPID;
@@ -199,13 +199,15 @@ while (abs(error) > Tolerance ){//PID Loop W
 	            BackRightMotor.move_voltage(0);  
 
     }
+            if (abs(error) <= Tolerance) {
+            break;
+        }
     LastError = odom.error;
     }
     FrontLeftMotor.brake();
     BackLeftMotor.brake();
     FrontRightMotor.brake();
     BackRightMotor.brake();
-    break;
 } 
 
 void Odom::RunFlywheel(int target){
