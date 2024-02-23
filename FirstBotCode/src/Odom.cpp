@@ -167,7 +167,7 @@ void Odom::Rotate(float DegreesToRotate){//you spin me right round baby right ro
     odom.LeftTarget = -DegreesToMove + odom.LeftMotorEncoder;//fixes any clearing problems is there is any
     odom.RightTarget = DegreesToMove + odom.RightMotorEncoder;
     odom.error = Tolerance + 10; //kickstarts the loop
-    const float curve = -3.5;
+    const float curve = -1.6;
     const int maxVolt;
     float anotherPID;
 while (abs(error) > Tolerance ){//PID Loop W
@@ -180,7 +180,7 @@ while (abs(error) > Tolerance ){//PID Loop W
     right = -anotherPID;
     left = odom.PID;
 	FrontLeftMotor.move_voltage(maxVolt*(((1-curve)*left)/maxVolt+(curve*pow(left/maxVolt,7))));
-	BackLeftMotor.move_voltage(maxVolt*(((1-curve)*left)/maxVolt+(curve*pow(left/maxVolt,7))));
+	BackLeftMotor.move_voltage(maxVolt*(((1-curve)*left)/maxVolt+(curve*pow(left/maxVolt,7))));//doesnt actually mean the max voltage, just a variable name 
 	FrontRightMotor.move_voltage(maxVolt*(((1-curve)*right)/maxVolt+(curve*pow(right/maxVolt,7))));
 	BackRightMotor.move_voltage(maxVolt*(((1-curve)*right)/maxVolt+(curve*pow(right/maxVolt,7))));
     
