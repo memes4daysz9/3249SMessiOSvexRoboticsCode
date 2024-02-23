@@ -40,8 +40,8 @@ void ScreenStats(){
             pros::screen::fill_rect(1,1,480,240); // this is after auton is selected... fills entire screen
             pros::screen::set_pen(COLOR_WHITE);//set pen color
             pros::screen::print(pros::E_TEXT_MEDIUM,1,"flywheel RPM:  %d",calculatedFlywheelRPM);//displays the flywheel RPM at the first line
-            pros::screen::print(pros::E_TEXT_MEDIUM,2,"Brain Battery:  %d",pros::battery::get_capacity());//gets the brain battery... dont ask what the unit is i have no idea
-            pros::screen::print(pros::E_TEXT_MEDIUM,3,"ControllerBattery:  %d",MainController.get_battery_level())//controller battery in Mah i belive
+            pros::screen::print(pros::E_TEXT_MEDIUM,2,"Brain Battery:  %f",pros::battery::get_capacity());//gets the brain battery... dont ask what the unit is i have no idea
+            pros::screen::print(pros::E_TEXT_MEDIUM,3,"ControllerBattery:  %d",MainController.get_battery_level());//controller battery in Mah i belive
             pros::screen::print(pros::E_TEXT_MEDIUM,4,"Reft Side DriveTrain: %d",odom.LeftMotorEncoder);//gets the averaged left side drivetrain encoder
             pros::screen::print(pros::E_TEXT_MEDIUM,5,"Right Side DriveTrain %d",odom.RightMotorEncoder);//gets the averaged right side drivetrain encoder calculation, found in odom.cpp and odom.hpp
             //end Brain Screen func and now controller functions
@@ -60,8 +60,6 @@ void AutonStats(){//polls all related odometry functions for debuigging during a
     while(pros::competition::is_autonomous()){//while in autonomus...
         pros::screen::print(pros::E_TEXT_MEDIUM,1,"PID: %f",odom.PID);//gets the PID voltage coming from the motors
         pros::screen::print(pros::E_TEXT_MEDIUM,2,"Error: %f",odom.error);//gets the error from where its supposed to be to where its at right
-        pros::screen::print(pros::E_TEXT_MEDIUM,3,"left Side DriveTrain: %f",odom.LeftMotorEncoder);// same as above function
-        pros::screen::print(pros::E_TEXT_MEDIUM,4,"Right Side DriveTrain %f",odom.RightMotorEncoder);//same too lmao
         pros::screen::print(pros::E_TEXT_MEDIUM,5,"Left Target: %f",odom.LeftTarget);
         pros::screen::print(pros::E_TEXT_MEDIUM,6,"Right Target: %f",odom.RightTarget);
         pros::delay(100);// delays the loop from calling everything else, helps to keep things cool inside the brain and saves batter

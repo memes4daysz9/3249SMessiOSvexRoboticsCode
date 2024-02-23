@@ -19,6 +19,7 @@ class Odom{
     float LeftTarget;
     float RightTarget;
     float error; // difference between where its supposed to be compared to where it actually wants to be
+    float PID;
     Odom();//calls the class to call variables
     
     void Forward(float WantedDistance);//function for going forward

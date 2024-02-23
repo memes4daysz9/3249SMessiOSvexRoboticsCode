@@ -70,8 +70,10 @@ void OdomTracking(){ //tracks the motors without any limits because i said so
         float kI = 0.1;
         float kD = 0.3;
     while (true){
-        LeftMotorEncoder = FrontLeftMotor.get_position() + BackLeftMotor.get_position() / 2;
-        RightMotorEncoder = FrontRightMotor.get_position() + BackRightMotor.get_position()/2;
+        odom.LeftMotorEncoder = FrontLeftMotor.get_position() + BackLeftMotor.get_position() / 2;
+        odom.RightMotorEncoder = FrontRightMotor.get_position() + BackRightMotor.get_position()/2;
+        pros::screen::print(pros::E_TEXT_MEDIUM,3,"left Side DriveTrain: %d",odom.LeftMotorEncoder);// same as above function
+        pros::screen::print(pros::E_TEXT_MEDIUM,4,"Right Side DriveTrain %d",odom.RightMotorEncoder);//same too lmao
     }
     
 
@@ -83,6 +85,7 @@ void Odom::Forward(float WantedDistance){ //distance in inches
     pros::Motor FrontRightMotor(2);
     pros::Motor BackLeftMotor(3);
     pros::Motor BackRightMotor(4);
+    pros::Controller MainController(pros::E_CONTROLLER_MASTER);//main controller
 
 	FrontLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);//when told to stop. itll stay right where its at and not coast
 	BackLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -111,11 +114,11 @@ while ((abs(error) > Tolerance) && !variablebug){//PID Loop W
     P = error * kP;//100 - 300
     I = (I+odom.error) *kI;
     D = (odom.error-LastError)*kD; //PID live time Calculation
-    PID = P + I + D;
-	FrontLeftMotor.move_voltage(PID);
-	BackLeftMotor.move_voltage(PID);
-	FrontRightMotor.move_voltage(PID);
-	BackRightMotor.move_voltage(PID);
+    odom.PID = P + I + D;
+	FrontLeftMotor.move_voltage(odom.PID);
+	BackLeftMotor.move_voltage(odom.PID);
+	FrontRightMotor.move_voltage(odom.PID);
+	BackRightMotor.move_voltage(odom.PID);
 
     pros::delay(20);// delays the loop from calling everything else, helps to keep things cool inside the brain and saves battery
 
@@ -140,6 +143,7 @@ void Odom::Rotate(float DegreesToRotate){//you spin me right round baby right ro
     pros::Motor FrontRightMotor(2);
     pros::Motor BackLeftMotor(3);
     pros::Motor BackRightMotor(4);
+    pros::Controller MainController(pros::E_CONTROLLER_MASTER);//main controller
 
     FrontLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);//when told to stop. itll stay right where its at and not coast
 	BackLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);

@@ -120,7 +120,7 @@ float BlockerPower;
 	P = error * odom.kD;
 	Output = FF*P;
 	if (target >= 1){
-    CataMotor.move_voltage(-Output);
+    CataMotor.move_voltage(Output);
 	}else {
 		CataMotor.move_voltage(0);
 	}
