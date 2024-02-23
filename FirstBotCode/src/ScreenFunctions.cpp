@@ -44,6 +44,9 @@ void ScreenStats(){
             pros::screen::print(pros::E_TEXT_MEDIUM,3,"ControllerBattery:  %d",MainController.get_battery_level());//controller battery in Mah i belive
             pros::screen::print(pros::E_TEXT_MEDIUM,4,"Reft Side DriveTrain: %d",odom.LeftMotorEncoder);//gets the averaged left side drivetrain encoder
             pros::screen::print(pros::E_TEXT_MEDIUM,5,"Right Side DriveTrain %d",odom.RightMotorEncoder);//gets the averaged right side drivetrain encoder calculation, found in odom.cpp and odom.hpp
+            pros::screen::print(pros::E_TEXT_MEDIUM,6,"PID: %f",odom.PID);//gets the PID voltage coming from the motors
+            pros::screen::print(pros::E_TEXT_MEDIUM,7,"Error: %f",odom.error);//gets the error from where its supposed to be to where its at right
+
             //end Brain Screen func and now controller functions
             if(AutonSide == 0){ //yelling function
                 MainController.print(0,0,"Autonomus Not Selected!");//yells in controller
