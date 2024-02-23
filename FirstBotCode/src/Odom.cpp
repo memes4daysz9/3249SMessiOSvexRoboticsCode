@@ -105,14 +105,15 @@ void Odom::Forward(float WantedDistance){ //distance in inches
     float I;
     float D;
     float LastError;//gets the error from the last loop
-    odom.LeftTarget = AngleInDegrees + odom.LeftMotorEncoder;
+    odom.LeftTarget = AngleInDegrees + odom.LeftMotorEncoder;//668 for 5 in
     odom.RightTarget = AngleInDegrees + odom.RightMotorEncoder;
-    
+    odom.error = Tolerance + 10; //kickstarts the loop
 while ((abs(error) > Tolerance) && !variablebug){//PID Loop W
     odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
-    P = error * kP;//100 - 300
-    I = (I+odom.error) *kI;
-    D = (odom.error-LastError)*kD; //PID live time Calculation
+    P = error * 10;
+    I = (I+odom.error) *0.1;
+    D = (odom.error-LastError)*3; //PID live time Calculation
+    pros::screen::print(pros::E_TEXT_MEDIUM,10,"Individual PID Values %f,%f,%f",P,I,D);
     odom.PID = P + I + D;
 	FrontLeftMotor.move_voltage(odom.PID);
 	BackLeftMotor.move_voltage(odom.PID);
@@ -162,11 +163,12 @@ void Odom::Rotate(float DegreesToRotate){//you spin me right round baby right ro
     float LastError;
     odom.LeftTarget = -DegreesToMove + odom.LeftMotorEncoder;//fixes any clearing problems is there is any
     odom.RightTarget = DegreesToMove + odom.RightMotorEncoder;
+    odom.error = Tolerance + 10; //kickstarts the loop
 while ((abs(error) > Tolerance )&& !variablebug){//PID Loop W
     odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
-    P = odom.error * kP;
-    I = (I+odom.error) * kI;
-    D = (odom.error-LastError) * kD; 
+    P = odom.error * 10;
+    I = (I+odom.error) * 0.1;
+    D = (odom.error-LastError) * 3; 
     PID = P + I + D;
 	FrontLeftMotor.move_voltage(PID);
 	BackLeftMotor.move_voltage(PID);
