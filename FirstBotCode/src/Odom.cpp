@@ -169,13 +169,15 @@ void Odom::Rotate(float DegreesToRotate){//you spin me right round baby right ro
     odom.error = Tolerance + 10; //kickstarts the loop
     const float curve = -3.5;
     const int maxVolt;
+    float anotherPID;
 while (abs(error) > Tolerance ){//PID Loop W
     odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
     P = odom.error * 10;
     I = (I+odom.error) * 0.1;
     D = (odom.error-LastError) * 3; 
     PID = P + I + D;
-    right = -odom.PID;
+    anotherPID = odom.PID;
+    right = -anotherPID;
     left = odom.PID;
 	FrontLeftMotor.move_voltage(maxVolt*(((1-curve)*left)/maxVolt+(curve*pow(left/maxVolt,7))));
 	BackLeftMotor.move_voltage(maxVolt*(((1-curve)*left)/maxVolt+(curve*pow(left/maxVolt,7))));
