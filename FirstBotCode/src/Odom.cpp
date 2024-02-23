@@ -105,7 +105,6 @@ void Odom::Forward(float WantedDistance){ //distance in inches
     float I;
     float D;
     float LastError;//gets the error from the last loop
-    ClearTrackers();
     odom.LeftTarget = AngleInDegrees + odom.LeftMotorEncoder;
     odom.RightTarget = AngleInDegrees + odom.RightMotorEncoder;
     
@@ -161,7 +160,6 @@ void Odom::Rotate(float DegreesToRotate){//you spin me right round baby right ro
     float kI = 0.3;
     float kD = 0.3;
     float LastError;
-    ClearTrackers();
     odom.LeftTarget = -DegreesToMove + odom.LeftMotorEncoder;//fixes any clearing problems is there is any
     odom.RightTarget = DegreesToMove + odom.RightMotorEncoder;
 while ((abs(error) > Tolerance )&& !variablebug){//PID Loop W
