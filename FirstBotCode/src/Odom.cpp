@@ -87,14 +87,6 @@ void Odom::Forward(float WantedDistance){ //distance in inches
     pros::Motor BackRightMotor(4);
     pros::Controller MainController(pros::E_CONTROLLER_MASTER);//main controller
 
-	FrontLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);//when told to stop. itll stay right where its at and not coast
-	BackLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-	FrontRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-	BackRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
-
-
-
 	float circumference =pi*diameter;//funny geometry calculation
 
 	float distancePerDegree = circumference/360;//more funny calculations
@@ -108,11 +100,11 @@ void Odom::Forward(float WantedDistance){ //distance in inches
     odom.LeftTarget = AngleInDegrees + odom.LeftMotorEncoder;//668 for 5 in
     odom.RightTarget = AngleInDegrees + odom.RightMotorEncoder;
     odom.error = Tolerance + 10; //kickstarts the loop
-while ((abs(error) > Tolerance) && !variablebug){//PID Loop W
+while ((abs(error) > Tolerance)){//PID Loop W
     odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
-    P = error * 10;
+    P = error * 32.5;
     I = (I+odom.error) *0.1;
-    D = (odom.error-LastError)*3; //PID live time Calculation
+    D = (odom.error-LastError)*10; //PID live time Calculation
     pros::screen::print(pros::E_TEXT_MEDIUM,10,"Individual PID Values %f,%f,%f",P,I,D);
     odom.PID = P + I + D;
 	FrontLeftMotor.move_voltage(odom.PID);
@@ -125,6 +117,15 @@ while ((abs(error) > Tolerance) && !variablebug){//PID Loop W
     if (odom.error == LastError){//helps fix stuf
             MainController.print(0,0,"PID Error!");
             variablebug = true;
+            	FrontLeftMotor.move_voltage(6000);
+	            BackLeftMotor.move_voltage(6000);
+	            FrontRightMotor.move_voltage(6000);
+	            BackRightMotor.move_voltage(6000);//PID boost
+                pros::delay(1);
+            	FrontLeftMotor.move_voltage(0);
+	            BackLeftMotor.move_voltage(0);
+	            FrontRightMotor.move_voltage(0);
+	            BackRightMotor.move_voltage(0);              
         }
     LastError = odom.error;//haha heres where it gets the last error
 
@@ -133,7 +134,7 @@ while ((abs(error) > Tolerance) && !variablebug){//PID Loop W
     BackLeftMotor.brake();
     FrontRightMotor.brake();
     BackRightMotor.brake();
-
+    break;
 
 }
 void Odom::Rotate(float DegreesToRotate){//you spin me right round baby right round like a record baby round round round round
@@ -160,25 +161,41 @@ void Odom::Rotate(float DegreesToRotate){//you spin me right round baby right ro
     float kP = 0.3;
     float kI = 0.3;
     float kD = 0.3;
+    float right;
+    float left;
     float LastError;
     odom.LeftTarget = -DegreesToMove + odom.LeftMotorEncoder;//fixes any clearing problems is there is any
     odom.RightTarget = DegreesToMove + odom.RightMotorEncoder;
     odom.error = Tolerance + 10; //kickstarts the loop
-while ((abs(error) > Tolerance )&& !variablebug){//PID Loop W
+    const float curve = -3.5;
+    const int maxVolt;
+while (abs(error) > Tolerance ){//PID Loop W
     odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
     P = odom.error * 10;
     I = (I+odom.error) * 0.1;
     D = (odom.error-LastError) * 3; 
     PID = P + I + D;
-	FrontLeftMotor.move_voltage(PID);
-	BackLeftMotor.move_voltage(PID);
-	FrontRightMotor.move_voltage(-PID);
-	BackRightMotor.move_voltage(-PID);
+    right = -odom.PID;
+    left = odom.PID;
+	FrontLeftMotor.move_voltage(maxVolt*(((1-curve)*left)/maxVolt+(curve*pow(left/maxVolt,7))));
+	BackLeftMotor.move_voltage(maxVolt*(((1-curve)*left)/maxVolt+(curve*pow(left/maxVolt,7))));
+	FrontRightMotor.move_voltage(maxVolt*(((1-curve)*right)/maxVolt+(curve*pow(right/maxVolt,7))));
+	BackRightMotor.move_voltage(maxVolt*(((1-curve)*right)/maxVolt+(curve*pow(right/maxVolt,7))));
     
     pros::delay(20);    
     if (odom.error == LastError){
             MainController.print(0,0,"PID Error!");
             variablebug = true;
+                FrontLeftMotor.move_voltage(6000);
+	            BackLeftMotor.move_voltage(6000);
+	            FrontRightMotor.move_voltage(6000);
+	            BackRightMotor.move_voltage(6000); //gives the loop a little boost
+                pros::delay(1);
+            	FrontLeftMotor.move_voltage(0);
+	            BackLeftMotor.move_voltage(0);
+	            FrontRightMotor.move_voltage(0);
+	            BackRightMotor.move_voltage(0);  
+
     }
     LastError = odom.error;
     }
@@ -186,6 +203,7 @@ while ((abs(error) > Tolerance )&& !variablebug){//PID Loop W
     BackLeftMotor.brake();
     FrontRightMotor.brake();
     BackRightMotor.brake();
+    break;
 } 
 
 void Odom::RunFlywheel(int target){
