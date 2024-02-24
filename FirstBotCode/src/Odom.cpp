@@ -13,7 +13,8 @@
 
     int calculatedFlywheelRPM;// calculates the rpm based on the gear ratio i added
 
-    const int Tolerance = 36;//fixed variable for the error to try to get the motors degrees in this range
+    const int Tolerance = 12;//fixed variable for the error to try to get the motors degrees in this range
+    const int RotationTolerance = 13;
 
     float kP; //nothin... this isnt here at all im not lazy...
     float kI; // universals for DriveTrain PID
@@ -70,8 +71,9 @@ void OdomTracking(){ //tracks the motors without any limits because i said so
         float kI = 0.1;
         float kD = 0.3;
     while (true){
-        odom.LeftMotorEncoder = FrontLeftMotor.get_position() + BackLeftMotor.get_position() / 2;
-        odom.RightMotorEncoder = FrontRightMotor.get_position() + BackRightMotor.get_position()/2;
+        odom.LeftMotorEncoder = (FrontLeftMotor.get_position() + BackLeftMotor.get_position()) / 2;
+        odom.RightMotorEncoder = (FrontRightMotor.get_position() + BackRightMotor.get_position()) / 2;
+
         pros::screen::print(pros::E_TEXT_MEDIUM,3,"left Side DriveTrain: %d",odom.LeftMotorEncoder);// same as above function
         pros::screen::print(pros::E_TEXT_MEDIUM,4,"Right Side DriveTrain %d",odom.RightMotorEncoder);//same too lmao
     }
@@ -87,7 +89,12 @@ void Odom::Forward(float WantedDistance){ //distance in inches
     pros::Motor BackRightMotor(4);
     pros::Controller MainController(pros::E_CONTROLLER_MASTER);//main controller
 
+	BackLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	FrontRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	BackRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    FrontLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	float circumference =pi*diameter;//funny geometry calculation
+    ClearTrackers();
 
 	float distancePerDegree = circumference/360;//more funny calculations
 
@@ -103,8 +110,8 @@ void Odom::Forward(float WantedDistance){ //distance in inches
 while ((abs(error) > Tolerance)){//PID Loop W
     odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
     P = error * 32.5;
-    I = (I+odom.error) *0.1;
-    D = (odom.error - LastError) * 3;
+    I = (I+odom.error) *0.2;
+    D = (odom.error - LastError) * 25;
     pros::screen::print(pros::E_TEXT_MEDIUM,10,"Individual PID Values %f,%f,%f",P,I,D);
     odom.PID = P + I + D;
 	FrontLeftMotor.move_voltage(odom.PID);
@@ -121,7 +128,7 @@ while ((abs(error) > Tolerance)){//PID Loop W
 	            BackLeftMotor.move_voltage(6000);
 	            FrontRightMotor.move_voltage(6000);
 	            BackRightMotor.move_voltage(6000);//PID boost
-                pros::delay(1);
+                pros::delay(20);
             	FrontLeftMotor.move_voltage(0);
 	            BackLeftMotor.move_voltage(0);
 	            FrontRightMotor.move_voltage(0);
@@ -129,86 +136,92 @@ while ((abs(error) > Tolerance)){//PID Loop W
         }
     LastError = odom.error;//haha heres where it gets the last error
 
+                if (abs(error) <= Tolerance) {
+            break;
+        }
     }
     FrontLeftMotor.brake();
     BackLeftMotor.brake();
     FrontRightMotor.brake();
     BackRightMotor.brake();
-    break;
 
 }
-void Odom::Rotate(float DegreesToRotate){//you spin me right round baby right round like a record baby round round round round
-    
-    bool TargetMet;
-	pros::Motor FrontLeftMotor(1);
+
+void Odom::Rotate(float DegreesToRotate) {
+    pros::Motor FrontLeftMotor(1);
     pros::Motor FrontRightMotor(2);
     pros::Motor BackLeftMotor(3);
     pros::Motor BackRightMotor(4);
     pros::Controller MainController(pros::E_CONTROLLER_MASTER);//main controller
-
-    FrontLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);//when told to stop. itll stay right where its at and not coast
-	BackLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-	FrontRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-	BackRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
-	float circumference =pi*diameter;//weird turning calculations
-	float DistanceToMoveOnCircumference = DegreesToRotate/360  * circumference;
-	float DegreesToMove = DistanceToMoveOnCircumference / diameter * 360;
-    bool variablebug = false; //i belive this is the way to go about fixing 
-	float P;
-    float I;
-    float D;
-    float kP = 0.3;
-    float kI = 0.3;
-    float kD = 0.3;
-    float right;
-    float left;
-    float LastError;
-    odom.LeftTarget = -DegreesToMove + odom.LeftMotorEncoder;//fixes any clearing problems is there is any
-    odom.RightTarget = DegreesToMove + odom.RightMotorEncoder;
-    odom.error = Tolerance + 10; //kickstarts the loop
+    // Constants for PID control
+    ClearTrackers();
+    const float kP = 0.3;
+    const float kI = 0.1;
+    const float kD = 0.3;
+    const int maxVoltage = 12000;
     const float curve = -1.6;
-    const int maxVolt = 1200;
-    float anotherPID;
-while (abs(error) > Tolerance ){//PID Loop W
-    odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
-    P = odom.error * 10;
-    I = (I+odom.error) * 0.1;
-    D = (error - LastError) * 3;
-    PID = P + I + D;
-    anotherPID = odom.PID;
-    right = -anotherPID;
-    left = odom.PID;
-	FrontLeftMotor.move_voltage(maxVolt*(((1-curve)*left)/maxVolt+(curve*pow(left/maxVolt,7)))+1200);
-	BackLeftMotor.move_voltage(maxVolt*(((1-curve)*left)/maxVolt+(curve*pow(left/maxVolt,7)))+1200);//doesnt actually mean the max voltage, just a variable name 
-	FrontRightMotor.move_voltage(maxVolt*(((1-curve)*right)/maxVolt+(curve*pow(right/maxVolt,7)))+1200);
-	BackRightMotor.move_voltage(maxVolt*(((1-curve)*right)/maxVolt+(curve*pow(right/maxVolt,7)))+1200);
+    const float speed = 200;
+    const float RightAngledegreeMod = 1.3;
+    //90 Degrees needs a modifer
+    //45 is fine
+    //
+    // Calculate target distance to move based on degrees to rotate
+    float circumference = pi * diameter;
+    float DistanceToMoveOnCircumference = DegreesToRotate / 360 * circumference;
+    float DegreesToMove = DistanceToMoveOnCircumference / diameter * 360;
     
-    pros::delay(20);    
-    if (odom.error == LastError){
-            MainController.print(0,0,"PID Error!");
-            variablebug = true;
-                FrontLeftMotor.move_voltage(6000);
-	            BackLeftMotor.move_voltage(6000);
-	            FrontRightMotor.move_voltage(6000);
-	            BackRightMotor.move_voltage(6000); //gives the loop a little boost
-                pros::delay(1);
-            	FrontLeftMotor.move_voltage(0);
-	            BackLeftMotor.move_voltage(0);
-	            FrontRightMotor.move_voltage(0);
-	            BackRightMotor.move_voltage(0);  
-
-    }
-            if (abs(error) <= Tolerance) {
-            break;
+    // Initialize PID variables
+    float P, I = 0, D;
+    float LastError = 0;
+    
+    // Set target encoder values
+    odom.RightTarget = DegreesToMove + odom.RightMotorEncoder;
+    odom.LeftTarget = DegreesToMove + odom.LeftMotorEncoder;
+    // Main PID control loop
+            if(sgn(DegreesToRotate) == 0){
+            odom.error = odom.LeftTarget - odom.LeftMotorEncoder;
+        }else{
+            odom.error = odom.RightTarget - odom.RightMotorEncoder;
         }
-    LastError = odom.error;
+   while (abs(odom.error) > RotationTolerance) {
+        // Calculate error
+        if(sgn(DegreesToRotate) == 0){
+            odom.error = odom.LeftTarget + odom.LeftMotorEncoder;
+        }else{
+            odom.error = odom.RightTarget + odom.RightMotorEncoder;
+        }
+        //odom.error = sgn(DegreesToRotate) * (odom.RightTarget - odom.RightMotorEncoder)
+        P = error * 30.25;
+        I = (I+error) * 1;
+        D = (odom.error - LastError)*0.1;
+        odom.PID = P+I+D;
+        // Adjust motor voltages based on PID output
+        float right = -odom.PID;
+        float left = odom.PID;
+        
+        FrontLeftMotor.move_voltage(left);
+        BackLeftMotor.move_voltage(left);
+        FrontRightMotor.move_voltage(right);
+        BackRightMotor.move_voltage(right);
+        
+        // Update last error
+        LastError = odom.error;
+        
+        // Delay to control loop rate
+        pros::delay(20);
     }
+    
+    FrontLeftMotor.move_velocity(50);
+    BackLeftMotor.move_velocity(50);//stop
+    FrontRightMotor.move_velocity(-50);
+    BackRightMotor.move_velocity(-50);
+
     FrontLeftMotor.brake();
     BackLeftMotor.brake();
-    FrontRightMotor.brake();
+    FrontRightMotor.brake();//brake
     BackRightMotor.brake();
-} 
+}
+
 
 void Odom::RunFlywheel(int target){
 

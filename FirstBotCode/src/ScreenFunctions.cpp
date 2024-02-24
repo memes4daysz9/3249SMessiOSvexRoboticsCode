@@ -53,7 +53,7 @@ void ScreenStats(){
                 MainController.print(0,0,"Autonomus Not Selected!");//yells in controller
             }
             MainController.print(0,0,"AutonSide:%d",AutonSide);//gets the autonside name
-            pros::delay(10); // delays the loop from calling everything else, helps to keep things cool inside the brain and saves battery   
+            pros::delay(100); // delays the loop from calling everything else, helps to keep things cool inside the brain and saves battery   
     }
 }
 void AutonStats(){//polls all related odometry functions for debuigging during autonomus
