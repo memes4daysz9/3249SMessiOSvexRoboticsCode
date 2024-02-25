@@ -38,7 +38,7 @@ odom.Forward(48.5);
 }else if (AutonSide == 4){
 	//red no matchload
 }else{
-	odom.Forward(24);
+	odom.Forward(2.5);
 }
 }
 

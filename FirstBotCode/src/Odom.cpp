@@ -104,20 +104,27 @@ void Odom::Forward(float WantedDistance){ //distance in inches
     float I;
     float D;
     float LastError;//gets the error from the last loop
+    float MotorAdjuster;
     odom.LeftTarget = AngleInDegrees + odom.LeftMotorEncoder;//668 for 5 in
     odom.RightTarget = AngleInDegrees + odom.RightMotorEncoder;
     odom.error = Tolerance + 10; //kickstarts the loop
 while ((abs(error) > Tolerance)){//PID Loop W
+//pid Calculations
     odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
-    P = error * 32.5;
-    I = (I+odom.error) *0.2;
-    D = (odom.error - LastError) * 25;
+    P = error * 75;
+    I = (I+odom.error) *0.05;
+    D = (odom.error - LastError) * 1;
     pros::screen::print(pros::E_TEXT_MEDIUM,10,"Individual PID Values %f,%f,%f",P,I,D);
     odom.PID = P + I + D;
-	FrontLeftMotor.move_voltage(odom.PID);
-	BackLeftMotor.move_voltage(odom.PID);
-	FrontRightMotor.move_voltage(odom.PID);
-	BackRightMotor.move_voltage(odom.PID);
+
+//LeftAndRightCorrections
+MotorAdjuster = LeftMotorEncoder - RightMotorEncoder;
+
+//Motor OutPut
+	FrontLeftMotor.move_voltage(odom.PID - MotorAdjuster);
+	BackLeftMotor.move_voltage(odom.PID - MotorAdjuster);
+	FrontRightMotor.move_voltage(odom.PID + MotorAdjuster + 50);
+	BackRightMotor.move_voltage(odom.PID + MotorAdjuster + 50);
 
     pros::delay(20);// delays the loop from calling everything else, helps to keep things cool inside the brain and saves battery
 
