@@ -42,6 +42,7 @@
 
     double heading;
 
+    double deltaTheta;
 Odom::Odom(){//calls the variables inside class
     float FkD;
     float FKi;
@@ -86,11 +87,11 @@ void Odom::ClearTrackers(){//resets the positions
         heading = 0;
     }
 }
-double degRad(double x) {
-    return (x * (M_PI/180));
+double DegToRad(double x) {
+    return (x * (pi/180));
 }
-double radDeg(double x) {
-    return (x* (180/M_PI));
+double RadToDeg(double x) {
+    return (x* (180/pi));
 }
 void OdomTracking(){
     
@@ -99,83 +100,29 @@ void OdomTracking(){
     pros::Motor BackLeftMotor(3);
     pros::Motor BackRightMotor(4);
 
-    double lastPosition[4]; // x,y then left and right rotations in inches
-    double lastHeading; // last Theta value
-        double motorLeftAvg = 0;
-        double motorRightAvg = 0;
-        double distanceOffset = 0;
-        double deltaLeft = 0;
-        double deltaRight = 0;
-        double distLeft = 0;
-        double distRight = 0;
-        double newHeading = 0;
-        double orientationAvg = 0;
-        double cartToPolarR = 0;  
-        double cartToPolarθ = 0;
-        double deltaAngle = 0;
-        double gearRatio = 1;
-        double TrackLength;
-        double wheelSize = diameter;
-        double trackLength = 11.75;
-        double position[4];
-        while (true) { // ONLY INITIALIZE AS THREAD, NEVER FUNCTION
 
-  /*      for (int i = 0; i < std::size(motorPortLeft); ++i) {
-            motorLeftAvg = motorLeftAvg + pros::c::motor_get_position(motorPortLeft[i]);
-            motorRightAvg = motorRightAvg + pros::c::motor_get_position(motorPortRight[i]);
-        } */
-        odom.LeftMotorEncoder = FrontLeftMotor.get_position();
-        odom.RightMotorEncoder = FrontRightMotor.get_position();
+    double x;
+    double y;
+    double theta;          
+        while (true) { 
+                odom.RightMotorEncoder = FrontRightMotor.get_position();
+                odom.LeftMotorEncoder = FrontLeftMotor.get_position();
 
-        motorLeftAvg = -1 * FrontLeftMotor.get_position() * gearRatio;
-        motorRightAvg = -1 * BackRightMotor.get_position()* gearRatio;
-        deltaLeft = (motorLeftAvg - lastPosition[2]);
-        deltaRight = (motorRightAvg - lastPosition[3]);
-        distLeft = degRad(deltaLeft) * (wheelSize/2);
-        distRight = degRad(deltaRight) * (wheelSize/2);  
+                double leftDistance = (odom.LeftMotorEncoder * pi * diameter) / 360.0;
+                double rightDistance = (odom.RightMotorEncoder * pi * diameter) / 360.0;
 
-        heading = heading + ((distLeft - distRight)/trackLength); 
-      //  heading = pros::c::imu_get_heading(11);
-        deltaAngle = heading - lastHeading;
-        if(deltaAngle < 0.1) {
-            if (distRight == 0) { 
-            distanceOffset = distRight;
-            }
-            else {
-                distanceOffset = distLeft;
-            }
-        }
-        else {
+                double distance = (leftDistance + rightDistance) / 2.0;
+                deltaTheta = (rightDistance - leftDistance) / TrackLength;
 
-            if (distRight == 0) { 
-                distanceOffset = 2*sin(heading/2) * (distRight/deltaAngle + (trackLength/2)); // this is the distance travelled, it will be added to "distance" which is purely a PID variable that does not matter whatsoever. 
-            }
-            else {
-                distanceOffset = 2*sin(heading/2) * (distLeft/deltaAngle + (trackLength/2)); // this is the distance travelled, it will be added to "distance" which is purely a PID variable that does not matter whatsoever. 
-            }    
-        }
-        orientationAvg = lastHeading + deltaAngle/2;
-        cartToPolarR = distanceOffset;  
-        cartToPolarθ = 0; 
-        position[0] = cartToPolarR*cos(cartToPolarθ-orientationAvg)+position[0];
-        position[1] = cartToPolarR*sin(cartToPolarθ-orientationAvg)+position[1];
-
+        odom.X += distance * cos(theta + deltaTheta / 2.0);
+        odom.Y += distance * sin(theta + deltaTheta / 2.0);
+        theta += deltaTheta;
         
-        lastPosition[0] = position[0]; 
-        lastPosition[1] = position[1];
-        lastPosition[2] = motorLeftAvg;
-        lastPosition[3] = motorRightAvg;
-        lastHeading = heading;
- 
-        pros::delay(10);   
-        // DEBUG FUNCTIONS
+        heading = RadToDeg(theta);//heading is in degrees, theta is in radians
     
-     pros::screen::print(pros::E_TEXT_MEDIUM,1,"X: %f", position[0]);
-     pros::screen::print(pros::E_TEXT_MEDIUM,2,"Y: %f", position[1]);
-     pros::screen::print(pros::E_TEXT_MEDIUM,3,"Head: %d", int(radDeg(heading)));
- //    pros::lcd::print(3,"kms: %f", distanceOffset);
- //    pros::lcd::print(4,"z: %f", position[0]);
- //    pros::lcd::print(5,"j: %f", position[1]);
+        pros::screen::print(pros::E_TEXT_MEDIUM,1,"X: %f", x);
+        pros::screen::print(pros::E_TEXT_MEDIUM,2,"Y: %f", y);
+        pros::screen::print(pros::E_TEXT_MEDIUM,3,"Facing Degrees %d",);
     
     }
 }
@@ -284,14 +231,14 @@ void Odom::Rotate(float DegreesToRotate) {
     odom.RightTarget = DegreesToRotate;
     // Main PID control loop
     if (DegreesToRotate > 0){
-        odom.error = odom.RightTarget - int (radDeg(heading));
+        odom.error = odom.RightTarget - int (heading);
     }else {
-        odom.error = int (radDeg(heading)) - odom.RightTarget;
+        odom.error = int (heading) - odom.RightTarget;
     }
     
    while (abs(error) > RotationTolerance) {
         // Calculate error
-        odom.error = int(radDeg(heading)) - odom.RightTarget;
+        odom.error = int(heading) - odom.RightTarget;
         //odom.error = odom.RightTarget - heading ;
         pros::screen::print(pros::E_TEXT_MEDIUM,4,"Error: %f", odom.error);
         pros::screen::print(pros::E_TEXT_MEDIUM,5,"RightTarget %f", odom.RightTarget);
@@ -321,6 +268,57 @@ void Odom::Rotate(float DegreesToRotate) {
     BackRightMotor.brake();
 }
 
+void PurePursuitThreeHandles(int[2] p1,int[2] p2,int[2] p3){
+    const  int pureTolerance = 1;
+    double t; //the progression of the curve
+    int x1 = p1[1];
+    int y1= p1[2];
+    int x2= p2[1];//dont look at it too hard
+    int y2= p2[2];
+    int x3= p3[1];
+    int y3= p3[2];
+    double errorX;
+    double errorY;
+
+    double PX;
+    double PY;
+
+    const double Ykp = 20;
+
+    double biezerXcalc;
+    double biezerYcalc;
+
+
+    while(t < 0.9999){
+        
+        if (abs(errorX) < pureTolerance){
+            t += 0.1;
+        }
+        biezerXcalc = ((pow(1-t,2) * x1 ) + (2(1-t)*t*x2) + (pow(t,2)*x2)) * t; // essentially the targets
+        biezerYcalc = ((pow(1-t,2) * y1 ) + (2(1-t)*t*y2) + (pow(t,2)*y2)) * t;
+        errorX = biezerXcalc - odom.x;
+        errorY =  (RadToDeg(std::atan2(biezerYcalc - odom.y,biezerXcalc - odom.x)) - heading); // this is probably wrong OH WELLLLLL i dont belive im suppost to get the tangent from that
+        PX = errorX * 75;
+        I =(I + error) * 0.05
+        PY = errorY * Ykp;
+        PI = PX + I;
+        //y can be be just where the bot is looking
+        if(abs(errorY) > RotationTolerance){
+            FrontLeftMotor.move_voltage(PY * 1);
+            FrontRightMotor.move_voltage(PY * -1);
+            BackLeftMotor.move_voltage(PY * 1);
+            BackRightMotor.move_voltage(PY * -1);
+        }else{
+            FrontLeftMotor.move_voltage(PI);
+            FrontRightMotor.move_voltage(PI);
+            BackLeftMotor.move_voltage(PI);
+            BackRightMotor.move_voltage(PI);
+        }
+
+
+
+    }
+}
 
 void Odom::RunFlywheel(int target){
 
