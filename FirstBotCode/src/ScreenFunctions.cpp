@@ -39,15 +39,13 @@ void ScreenStats(){
             pros::screen::set_pen(COLOR_BLACK);//set pen color
             pros::screen::fill_rect(1,1,480,240); // this is after auton is selected... fills entire screen
             pros::screen::set_pen(COLOR_WHITE);//set pen color
-            pros::screen::print(pros::E_TEXT_MEDIUM,1,"flywheel RPM:  %d",calculatedFlywheelRPM);//displays the flywheel RPM at the first line
-            pros::screen::print(pros::E_TEXT_MEDIUM,2,"Brain Battery:  %f",pros::battery::get_capacity());//gets the brain battery... dont ask what the unit is i have no idea
-            pros::screen::print(pros::E_TEXT_MEDIUM,3,"ControllerBattery:  %d",MainController.get_battery_level());//controller battery in Mah i belive
-            pros::screen::print(pros::E_TEXT_MEDIUM,4,"Reft Side DriveTrain: %d",odom.LeftMotorEncoder);//gets the averaged left side drivetrain encoder
-            pros::screen::print(pros::E_TEXT_MEDIUM,5,"Right Side DriveTrain %d",odom.RightMotorEncoder);//gets the averaged right side drivetrain encoder calculation, found in odom.cpp and odom.hpp
-            pros::screen::print(pros::E_TEXT_MEDIUM,6,"PID: %f",odom.PID);//gets the PID voltage coming from the motors
-            pros::screen::print(pros::E_TEXT_MEDIUM,7,"Error: %f",odom.error);//gets the error from where its supposed to be to where its at right
-            pros::screen::print(pros::E_TEXT_MEDIUM,8,"Left Target: %f",odom.LeftTarget);
-            pros::screen::print(pros::E_TEXT_MEDIUM,9,"Right Target: %f",odom.RightTarget);
+            //pros::screen::print(pros::E_TEXT_MEDIUM,1,"flywheel RPM:  %d",calculatedFlywheelRPM);//displays the flywheel RPM at the first line
+            //pros::screen::print(pros::E_TEXT_MEDIUM,2,"Brain Battery:  %f",pros::battery::get_capacity());//gets the brain battery... dont ask what the unit is i have no idea
+            //pros::screen::print(pros::E_TEXT_MEDIUM,3,"ControllerBattery:  %d",MainController.get_battery_level());//controller battery in Mah i belive
+            //pros::screen::print(pros::E_TEXT_MEDIUM,6,"PID: %f",odom.PID);//gets the PID voltage coming from the motors
+            //pros::screen::print(pros::E_TEXT_MEDIUM,7,"Error: %f",odom.error);//gets the error from where its supposed to be to where its at right
+           //pros::screen::print(pros::E_TEXT_MEDIUM,8,"Left Target: %f",odom.LeftTarget);
+            //pros::screen::print(pros::E_TEXT_MEDIUM,9,"Right Target: %f",odom.RightTarget);
             //end Brain Screen func and now controller functions
             if(AutonSide == 0){ //yelling function
                 MainController.print(0,0,"Autonomus Not Selected!");//yells in controller

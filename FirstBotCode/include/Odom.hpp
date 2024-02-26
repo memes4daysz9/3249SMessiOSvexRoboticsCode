@@ -20,8 +20,10 @@ class Odom{
     float RightTarget;
     float error; // difference between where its supposed to be compared to where it actually wants to be
     float PID;
+    float X;
+    float Y;
     Odom();//calls the class to call variables
-    
+    void ClearTrackers();
     void Forward(float WantedDistance);//function for going forward
     void Rotate(float DegreesToRotate);//function for turning in degrees because radians are weird
     void RunFlywheel(int target); // runs the flywheel using the target

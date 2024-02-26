@@ -1,7 +1,7 @@
 #include "main.h"
 
 
-	float diameter = 4.125f;//diameter of the omni wheels for distance measuring
+	double diameter = 4.125f;//diameter of the omni wheels for distance measuring
 
 	float radius = diameter * 0.5;//radius of the omni wheel for distance measuring
 
@@ -14,13 +14,33 @@
     int calculatedFlywheelRPM;// calculates the rpm based on the gear ratio i added
 
     const int Tolerance = 12;//fixed variable for the error to try to get the motors degrees in this range
-    const int RotationTolerance = 13;
+    const int RotationTolerance = 10;
 
     float kP; //nothin... this isnt here at all im not lazy...
     float kI; // universals for DriveTrain PID
     float kD;
 
+    float Left;
+    float Right;
 
+    float DeltaLeft;
+    float DeltaRight;
+    float DeltaFacing;
+
+    float LastLeft; //for delta calculations
+    float LastRight;
+    float LastFacing;
+
+    float LeftDistance; // distance traveled
+    float RightDistance;
+        
+    const float TrackLength = 11.75;
+
+    float Facing;
+    float AverageOrentation;
+    float DistanceOffset;
+
+    double heading;
 
 Odom::Odom(){//calls the variables inside class
     float FkD;
@@ -31,6 +51,8 @@ Odom::Odom(){//calls the variables inside class
     int LeftMotorEncoder;
     float PID;
     float error;
+    float X;
+    float Y;
 }
   
 int Odom::sgn(int val) { //signum function
@@ -48,7 +70,7 @@ int abs(float Value){//absolute value
         return Value;
     }
 }
-void ClearTrackers(){//resets the positions
+void Odom::ClearTrackers(){//resets the positions
     pros::Motor FrontLeftMotor(1);
     pros::Motor FrontRightMotor(2);
     pros::Motor BackLeftMotor(3);
@@ -59,26 +81,103 @@ void ClearTrackers(){//resets the positions
     FrontRightMotor.tare_position();
     BackLeftMotor.tare_position();
     BackRightMotor.tare_position();
+
+    while(heading != 0){
+        heading = 0;
+    }
 }
-void OdomTracking(){ //tracks the motors without any limits because i said so
+double degRad(double x) {
+    return (x * (M_PI/180));
+}
+double radDeg(double x) {
+    return (x* (180/M_PI));
+}
+void OdomTracking(){
     
     pros::Motor FrontLeftMotor(1);
     pros::Motor FrontRightMotor(2);
     pros::Motor BackLeftMotor(3);
     pros::Motor BackRightMotor(4);
 
-        float kP = 30;
-        float kI = 0.1;
-        float kD = 0.3;
-    while (true){
-        odom.LeftMotorEncoder = (FrontLeftMotor.get_position() + BackLeftMotor.get_position()) / 2;
-        odom.RightMotorEncoder = (FrontRightMotor.get_position() + BackRightMotor.get_position()) / 2;
+    double lastPosition[4]; // x,y then left and right rotations in inches
+    double lastHeading; // last Theta value
+        double motorLeftAvg = 0;
+        double motorRightAvg = 0;
+        double distanceOffset = 0;
+        double deltaLeft = 0;
+        double deltaRight = 0;
+        double distLeft = 0;
+        double distRight = 0;
+        double newHeading = 0;
+        double orientationAvg = 0;
+        double cartToPolarR = 0;  
+        double cartToPolarθ = 0;
+        double deltaAngle = 0;
+        double gearRatio = 1;
+        double TrackLength;
+        double wheelSize = diameter;
+        double trackLength = 11.75;
+        double position[4];
+        while (true) { // ONLY INITIALIZE AS THREAD, NEVER FUNCTION
 
-        pros::screen::print(pros::E_TEXT_MEDIUM,3,"left Side DriveTrain: %d",odom.LeftMotorEncoder);// same as above function
-        pros::screen::print(pros::E_TEXT_MEDIUM,4,"Right Side DriveTrain %d",odom.RightMotorEncoder);//same too lmao
-    }
+  /*      for (int i = 0; i < std::size(motorPortLeft); ++i) {
+            motorLeftAvg = motorLeftAvg + pros::c::motor_get_position(motorPortLeft[i]);
+            motorRightAvg = motorRightAvg + pros::c::motor_get_position(motorPortRight[i]);
+        } */
+        odom.LeftMotorEncoder = FrontLeftMotor.get_position();
+        odom.RightMotorEncoder = FrontRightMotor.get_position();
+
+        motorLeftAvg = -1 * FrontLeftMotor.get_position() * gearRatio;
+        motorRightAvg = -1 * BackRightMotor.get_position()* gearRatio;
+        deltaLeft = (motorLeftAvg - lastPosition[2]);
+        deltaRight = (motorRightAvg - lastPosition[3]);
+        distLeft = degRad(deltaLeft) * (wheelSize/2);
+        distRight = degRad(deltaRight) * (wheelSize/2);  
+
+        heading = heading + ((distLeft - distRight)/trackLength); 
+      //  heading = pros::c::imu_get_heading(11);
+        deltaAngle = heading - lastHeading;
+        if(deltaAngle < 0.1) {
+            if (distRight == 0) { 
+            distanceOffset = distRight;
+            }
+            else {
+                distanceOffset = distLeft;
+            }
+        }
+        else {
+
+            if (distRight == 0) { 
+                distanceOffset = 2*sin(heading/2) * (distRight/deltaAngle + (trackLength/2)); // this is the distance travelled, it will be added to "distance" which is purely a PID variable that does not matter whatsoever. 
+            }
+            else {
+                distanceOffset = 2*sin(heading/2) * (distLeft/deltaAngle + (trackLength/2)); // this is the distance travelled, it will be added to "distance" which is purely a PID variable that does not matter whatsoever. 
+            }    
+        }
+        orientationAvg = lastHeading + deltaAngle/2;
+        cartToPolarR = distanceOffset;  
+        cartToPolarθ = 0; 
+        position[0] = cartToPolarR*cos(cartToPolarθ-orientationAvg)+position[0];
+        position[1] = cartToPolarR*sin(cartToPolarθ-orientationAvg)+position[1];
+
+        
+        lastPosition[0] = position[0]; 
+        lastPosition[1] = position[1];
+        lastPosition[2] = motorLeftAvg;
+        lastPosition[3] = motorRightAvg;
+        lastHeading = heading;
+ 
+        pros::delay(10);   
+        // DEBUG FUNCTIONS
     
-
+     pros::screen::print(pros::E_TEXT_MEDIUM,1,"X: %f", position[0]);
+     pros::screen::print(pros::E_TEXT_MEDIUM,2,"Y: %f", position[1]);
+     pros::screen::print(pros::E_TEXT_MEDIUM,3,"Head: %d", int(radDeg(heading)));
+ //    pros::lcd::print(3,"kms: %f", distanceOffset);
+ //    pros::lcd::print(4,"z: %f", position[0]);
+ //    pros::lcd::print(5,"j: %f", position[1]);
+    
+    }
 }
 void Odom::Forward(float WantedDistance){ //distance in inches
 	// for every 360degrees, the wheel will go its circumference
@@ -94,7 +193,7 @@ void Odom::Forward(float WantedDistance){ //distance in inches
 	BackRightMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     FrontLeftMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	float circumference =pi*diameter;//funny geometry calculation
-    ClearTrackers();
+    odom.ClearTrackers();
 
 	float distancePerDegree = circumference/360;//more funny calculations
 
@@ -113,8 +212,12 @@ while ((abs(error) > Tolerance)){//PID Loop W
     odom.error = ((odom.LeftTarget - odom.LeftMotorEncoder) + (odom.RightTarget - odom.RightMotorEncoder))/2;
     P = error * 75;
     I = (I+odom.error) *0.05;
-    D = (odom.error - LastError) * 1;
-    pros::screen::print(pros::E_TEXT_MEDIUM,10,"Individual PID Values %f,%f,%f",P,I,D);
+    D = (odom.error - LastError) * 10;
+    pros::screen::print(pros::E_TEXT_MEDIUM,4,"Individual PID Values %f,%f,%f",P,I,D);
+    pros::screen::print(pros::E_TEXT_MEDIUM,5,"Error %f",odom.error);
+    pros::screen::print(pros::E_TEXT_MEDIUM,6,"Left%f",odom.LeftMotorEncoder);
+    pros::screen::print(pros::E_TEXT_MEDIUM,7,"Right%f",odom.RightMotorEncoder);
+
     odom.PID = P + I + D;
 
 //LeftAndRightCorrections
@@ -161,46 +264,40 @@ void Odom::Rotate(float DegreesToRotate) {
     pros::Motor BackRightMotor(4);
     pros::Controller MainController(pros::E_CONTROLLER_MASTER);//main controller
     // Constants for PID control
-    ClearTrackers();
+    odom.ClearTrackers();
     const float kP = 0.3;
     const float kI = 0.1;
     const float kD = 0.3;
     const int maxVoltage = 12000;
     const float curve = -1.6;
-    const float speed = 200;
-    const float RightAngledegreeMod = 1.3;
     //90 Degrees needs a modifer
     //45 is fine
-    //
-    // Calculate target distance to move based on degrees to rotate
-    float circumference = pi * diameter;
-    float DistanceToMoveOnCircumference = DegreesToRotate / 360 * circumference;
-    float DegreesToMove = DistanceToMoveOnCircumference / diameter * 360;
     
     // Initialize PID variables
     float P, I = 0, D;
     float LastError = 0;
-    
+    while (heading != 0){
+            heading = 0;
+    }
+
     // Set target encoder values
-    odom.RightTarget = DegreesToMove + odom.RightMotorEncoder;
-    odom.LeftTarget = DegreesToMove + odom.LeftMotorEncoder;
+    odom.RightTarget = DegreesToRotate;
     // Main PID control loop
-            if(sgn(DegreesToRotate) == 0){
-            odom.error = odom.LeftTarget - odom.LeftMotorEncoder;
-        }else{
-            odom.error = odom.RightTarget - odom.RightMotorEncoder;
-        }
-   while (abs(odom.error) > RotationTolerance) {
+    if (DegreesToRotate > 0){
+        odom.error = odom.RightTarget - int (radDeg(heading));
+    }else {
+        odom.error = int (radDeg(heading)) - odom.RightTarget;
+    }
+    
+   while (abs(error) > RotationTolerance) {
         // Calculate error
-        if(sgn(DegreesToRotate) == 0){
-            odom.error = odom.LeftTarget + odom.LeftMotorEncoder;
-        }else{
-            odom.error = odom.RightTarget + odom.RightMotorEncoder;
-        }
-        //odom.error = sgn(DegreesToRotate) * (odom.RightTarget - odom.RightMotorEncoder)
-        P = error * 30.25;
+        odom.error = int(radDeg(heading)) - odom.RightTarget;
+        //odom.error = odom.RightTarget - heading ;
+        pros::screen::print(pros::E_TEXT_MEDIUM,4,"Error: %f", odom.error);
+        pros::screen::print(pros::E_TEXT_MEDIUM,5,"RightTarget %f", odom.RightTarget);
+        P = error * 200;
         I = (I+error) * 1;
-        D = (odom.error - LastError)*0.1;
+        D = (odom.error - LastError)*15;
         odom.PID = P+I+D;
         // Adjust motor voltages based on PID output
         float right = -odom.PID;
@@ -217,11 +314,6 @@ void Odom::Rotate(float DegreesToRotate) {
         // Delay to control loop rate
         pros::delay(20);
     }
-    
-    FrontLeftMotor.move_velocity(50);
-    BackLeftMotor.move_velocity(50);//stop
-    FrontRightMotor.move_velocity(-50);
-    BackRightMotor.move_velocity(-50);
 
     FrontLeftMotor.brake();
     BackLeftMotor.brake();

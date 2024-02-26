@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "Messi 3.0",
+    "project_name": "BETA5",
     "target": "v5",
     "templates": {
       "kernel": {
@@ -167,9 +167,10 @@
       }
     },
     "upload_options": {
-      "description": "Messi OS",
-      "icon": "power",
-      "after": "screen"
+      "description": "BETA5",
+      "icon": "pros",
+      "after": "screen",
+      "slot": 2
     }
   }
 }
