@@ -48,7 +48,10 @@ odom.Forward(48.5);
 }else if (AutonSide == 4){
 	//red no matchload
 }else{
-	odom.Rotate(-360);
+	int P1[2] = {0,0};
+	int P2[2] = {12,0};
+	int P3[2] = {12,12};
+	odom.PurePursuitThreeHandles(P1,P2,P3);
 }
 }
 

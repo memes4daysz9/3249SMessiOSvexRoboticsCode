@@ -64,13 +64,13 @@ int Odom::sgn(int val) { //signum function
     }else {
         return (0);
     }}
-int abs(float Value){//absolute value
+/*int abs(float Value){//absolute value
     if(Value < 0){
         return -Value;
     }else {
         return Value;
     }
-}
+}*/
 void Odom::ClearTrackers(){//resets the positions
     pros::Motor FrontLeftMotor(1);
     pros::Motor FrontRightMotor(2);
@@ -103,26 +103,47 @@ void OdomTracking(){
 
     double x;
     double y;
-    double theta;          
+    double theta;        
+    double LastLeft;
+    double LastRight;  
+    double leftDistance;
+    double rightDistance;
+    double deltaLeft;
+    double deltaRight;
+    double distance;
+    int Left;
+    int Right;
         while (true) { 
-                odom.RightMotorEncoder = FrontRightMotor.get_position();
-                odom.LeftMotorEncoder = FrontLeftMotor.get_position();
 
-                double leftDistance = (odom.LeftMotorEncoder * pi * diameter) / 360.0;
-                double rightDistance = (odom.RightMotorEncoder * pi * diameter) / 360.0;
+                Left = FrontLeftMotor.get_position();
+                Right = FrontRightMotor.get_position();
 
-                double distance = (leftDistance + rightDistance) / 2.0;
-                deltaTheta = (rightDistance - leftDistance) / TrackLength;
+                odom.RightMotorEncoder = Right;
+                odom.LeftMotorEncoder = Left;
+
+                leftDistance = (FrontLeftMotor.get_position() * pi * diameter) / 360.0;
+                rightDistance = (FrontRightMotor.get_position() * pi * diameter) / 360.0;
+
+                deltaLeft = (FrontLeftMotor.get_position() - LastLeft);
+                deltaRight = (FrontRightMotor.get_position() - LastRight);
+
+                distance = (leftDistance + rightDistance) / 2.0; //distance traveled
+                deltaTheta = (leftDistance - rightDistance) / TrackLength;
 
         odom.X += distance * cos(theta + deltaTheta / 2.0);
         odom.Y += distance * sin(theta + deltaTheta / 2.0);
         theta += deltaTheta;
         
         heading = RadToDeg(theta);//heading is in degrees, theta is in radians
+
+        LastLeft = FrontLeftMotor.get_position();
+        LastRight = FrontRightMotor.get_position();
     
         pros::screen::print(pros::E_TEXT_MEDIUM,1,"X: %f", x);
         pros::screen::print(pros::E_TEXT_MEDIUM,2,"Y: %f", y);
-        pros::screen::print(pros::E_TEXT_MEDIUM,3,"Facing Degrees %d",);
+        pros::screen::print(pros::E_TEXT_MEDIUM,3,"Facing Degrees %d",heading);
+        pros::screen::print(pros::E_TEXT_MEDIUM,9,"Left %f", Left);
+        pros::screen::print(pros::E_TEXT_MEDIUM,10,"Right %f", FrontRightMotor.get_position());
     
     }
 }
@@ -268,7 +289,11 @@ void Odom::Rotate(float DegreesToRotate) {
     BackRightMotor.brake();
 }
 
-void PurePursuitThreeHandles(int[2] p1,int[2] p2,int[2] p3){
+void Odom::PurePursuitThreeHandles(int p1[2],int p2[2],int p3[2]){
+    pros::Motor FrontLeftMotor(1);
+    pros::Motor FrontRightMotor(2);
+    pros::Motor BackLeftMotor(3);
+    pros::Motor BackRightMotor(4);
     const  int pureTolerance = 1;
     double t; //the progression of the curve
     int x1 = p1[1];
@@ -288,18 +313,21 @@ void PurePursuitThreeHandles(int[2] p1,int[2] p2,int[2] p3){
     double biezerXcalc;
     double biezerYcalc;
 
+    double I;
+    double PI;
 
     while(t < 0.9999){
         
-        if (abs(errorX) < pureTolerance){
-            t += 0.1;
-        }
-        biezerXcalc = ((pow(1-t,2) * x1 ) + (2(1-t)*t*x2) + (pow(t,2)*x2)) * t; // essentially the targets
-        biezerYcalc = ((pow(1-t,2) * y1 ) + (2(1-t)*t*y2) + (pow(t,2)*y2)) * t;
-        errorX = biezerXcalc - odom.x;
-        errorY =  (RadToDeg(std::atan2(biezerYcalc - odom.y,biezerXcalc - odom.x)) - heading); // this is probably wrong OH WELLLLLL i dont belive im suppost to get the tangent from that
+        t += 0.1;
+
+        biezerXcalc = ((pow(1-t,2) * x1 ) + (2*(1-t)*t*x2) + (pow(t,2)*x2)) * t; // essentially the targets
+        biezerYcalc = ((pow(1-t,2) * y1 ) + (2*(1-t)*t*y2) + (pow(t,2)*y2)) * t;
+        errorX = biezerXcalc - odom.X;
+        errorY =  (RadToDeg(std::atan2(biezerYcalc - odom.Y,biezerXcalc - odom.X)) - heading); // this is probably wrong OH WELLLLLL i dont belive im suppost to get the tangent from that
+        pros::screen::print(pros::E_TEXT_MEDIUM,4,"Errors X: %f Y: %f", errorX,errorY);
+        pros::screen::print(pros::E_TEXT_MEDIUM,5,"t: %f", t);
         PX = errorX * 75;
-        I =(I + error) * 0.05
+        I =(I + error) * 0.05;
         PY = errorY * Ykp;
         PI = PX + I;
         //y can be be just where the bot is looking

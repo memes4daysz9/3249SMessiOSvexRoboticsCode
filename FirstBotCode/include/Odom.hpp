@@ -27,6 +27,7 @@ class Odom{
     void Forward(float WantedDistance);//function for going forward
     void Rotate(float DegreesToRotate);//function for turning in degrees because radians are weird
     void RunFlywheel(int target); // runs the flywheel using the target
+    void PurePursuitThreeHandles(int p1[2],int p2[2],int p3[2]);
     
 
     int sgn(int val);
