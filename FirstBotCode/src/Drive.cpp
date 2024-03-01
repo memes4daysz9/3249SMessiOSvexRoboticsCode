@@ -112,6 +112,7 @@ float BlockerPower;
 		CataMotor.set_current_limit(5000);//2500mA is the normal amount
 	}else if(MainController.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
 		target = 0;
+		odom.ClearTrackers();
 	}
 	    calculatedFlywheelRPM = CataMotor.get_actual_velocity() * FlywheelGearRatio;
     int accel = calculatedFlywheelRPM - prevCalculatedFlywheelRPM; //  glorified deltaRPM

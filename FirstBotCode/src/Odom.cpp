@@ -112,18 +112,18 @@ void OdomTracking(){
     double deltaRight;
     double distance;
     double LastTheta;
-    int Left;
-    int Right;
+    float EncoderLeft;
+    float EncoderRight;
         while (true) { 
 
-                Left = FrontLeftMotor.get_position();
-                Right = FrontRightMotor.get_position();
+                EncoderLeft = FrontLeftMotor.get_position();
+                EncoderRight = FrontRightMotor.get_position();
 
-                odom.RightMotorEncoder = Right;
-                odom.LeftMotorEncoder = Left;
+                odom.RightMotorEncoder = EncoderRight;
+                odom.LeftMotorEncoder = EncoderLeft;
 
-                deltaLeft = (FrontLeftMotor.get_position() - LastLeft);
-                deltaRight = (FrontRightMotor.get_position() - LastRight);
+                deltaLeft = (EncoderLeft - LastLeft);
+                deltaRight = (EncoderRight - LastRight);
 
                 leftDistance = DegToRad(deltaLeft) * radius;
                 rightDistance = DegToRad(deltaRight) * radius;
@@ -138,8 +138,8 @@ void OdomTracking(){
         
         heading = RadToDeg(theta);//heading is in degrees, theta is in radians
 
-        LastLeft = FrontLeftMotor.get_position();
-        LastRight = FrontRightMotor.get_position();
+        LastLeft = EncoderLeft;
+        LastRight = EncoderRight;
         LastTheta = theta;    
         pros::screen::print(pros::E_TEXT_MEDIUM,1,"X: %f", x);
         pros::screen::print(pros::E_TEXT_MEDIUM,2,"Y: %f", y);

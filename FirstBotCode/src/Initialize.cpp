@@ -1,6 +1,7 @@
 #include "main.h"
 using namespace std;//gets the funny file system info
 void initialize() {
+    odom.ClearTrackers();
     pros::Task OdomTask(OdomTracking); //multithreading W
     pros::Task ScreenTask(ScreenStats);
     pros::ADIDigitalOut FirstWingMan(1 ,'a');//solonoid calling
