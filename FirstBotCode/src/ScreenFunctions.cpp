@@ -34,8 +34,17 @@ void ScreenStats(){
 	pros::ADIDigitalOut SecondWingMan(2 ,'b');//declares the right solonoid into another funny pun
     pros::Controller MainController(pros::E_CONTROLLER_MASTER); //MainController assinging in here
 
+    pros::Motor FrontLeftMotor(1);
+    pros::Motor FrontRightMotor(2);
+    pros::Motor BackLeftMotor(3);
+    pros::Motor BackRightMotor(4);
+	pros::Motor FlyMotor(5);
+	pros::Motor Intake(6);
+	pros::Motor LeftMiddleMotor(7);
+	pros::Motor RightMiddleMotor(8);
 
-    while (true){
+
+    while (AutonSide != 3){
             pros::screen::set_pen(COLOR_BLACK);//set pen color
             pros::screen::fill_rect(1,1,480,240); // this is after auton is selected... fills entire screen
             pros::screen::set_pen(COLOR_WHITE);//set pen color
@@ -55,17 +64,12 @@ void ScreenStats(){
             MainController.print(0,0,"AutonSide:%d",AutonSide);//gets the autonside name
             pros::delay(100); // delays the loop from calling everything else, helps to keep things cool inside the brain and saves battery   
     }
-}
-void AutonStats(){//polls all related odometry functions for debuigging during autonomus
-        pros::screen::set_pen(COLOR_BLACK);//set pen color
-        pros::screen::fill_rect(1,1,480,240); // this is after auton is selected
+    while (AutonSide == 3){ // temp function essentially
+        pros::screen::set_eraser(COLOR_BLUE);
         pros::screen::erase();
-        pros::screen::set_pen(COLOR_WHITE);//set pen color
-    while(pros::competition::is_autonomous()){//while in autonomus...
-        pros::screen::print(pros::E_TEXT_MEDIUM,1,"PID: %f",odom.PID);//gets the PID voltage coming from the motors
-        pros::screen::print(pros::E_TEXT_MEDIUM,2,"Error: %f",odom.error);//gets the error from where its supposed to be to where its at right
-
-        pros::delay(100);// delays the loop from calling everything else, helps to keep things cool inside the brain and saves batter
+        pros::delay(500);
+        pros::screen::print(pros::E_TEXT_MEDIUM,1,"Left Motors in C %d,%d,%d",FrontLeftMotor.get_temperature(),LeftMiddleMotor.get_temperature(),BackLeftMotor.get_temperature());
+        pros::screen::print(pros::E_TEXT_MEDIUM,2,"Right Motors in C %d,%d,%d",FrontRightMotor.get_temperature(),RightMiddleMotor.get_temperature(),BackRightMotor.get_temperature());   
+        pros::delay(500);
     }
-    
 }

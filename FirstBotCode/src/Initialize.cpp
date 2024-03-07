@@ -16,17 +16,17 @@ void initialize() {
     //others
     pros::Motor CataMotor_initializer(5, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_COUNTS);
     pros::Motor Intake_initializer(6, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_COUNTS);//other motors
-    pros::Motor LeftShotBlock_initializer(7, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_COUNTS);
-    pros::Motor RightShotBlock_initializer(8, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_COUNTS);
+    pros::Motor LeftMiddleMotor_initializer(7, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_COUNTS);
+    pros::Motor RightMiddleMotor_initializer(8, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_COUNTS);
     
     pros::Motor FrontLeftMotor(1);
     pros::Motor FrontRightMotor(2);
     pros::Motor BackLeftMotor(3);
     pros::Motor BackRightMotor(4);
-	pros::Motor CataMotor(5);
+	pros::Motor FlyMotor(5);
 	pros::Motor Intake(6);
-	pros::Motor LeftBlocker(7);
-	pros::Motor RightBlocker(8);
+	pros::Motor LeftMiddleMotor(7);
+	pros::Motor RightMiddleMotor(8);
 
     if (pros::usd::is_installed()){ // filesystem currently not avaliable... definitly at worlds if somehow i make it
         ofstream CurrentLog ("/usd/LogData.txt");
